@@ -1,0 +1,11 @@
+{
+	"$schema": "https://gist.github.com/TheMysteryz/037c8bd90e0c4ab5897bbf78abd5e345/raw/17a7b87342aefb452e2787647438961b5f5803e9/zr-page-conf",
+	"infos": {
+		"author": "Roland ZHU",
+		"bornYear": 1999,
+		"socials": {
+			"github": "TheMysteryz",
+			"linkedin": "zhuroland"
+		}
+	}
+}

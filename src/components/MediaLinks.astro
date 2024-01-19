@@ -1,0 +1,45 @@
+---
+import MediaIcons from './MediaIcons.astro';
+import type { Media } from '../types/media';
+
+type Props = {
+	media: Media;
+	value: string;
+};
+
+const { media, value } = Astro.props;
+
+let url = '';
+
+switch (media) {
+	case 'github':
+		url = `https://github.com/${value}`;
+		break;
+	case 'youtube':
+		url = `https://youtube.com/@${value}`;
+	case 'linkedin':
+		url = `https://linkedin.com/in/${value}`;
+	case 'twitch':
+		url = `https://twitch.tv/${value}`;
+}
+---
+
+{
+	url && (
+		<a href={url} target="_blank">
+			<MediaIcons icon={media} />
+		</a>
+	)
+}
+
+<style>
+	a {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		color: #fff8;
+	}
+	a:hover {
+		color: rgba(var(--accent-light));
+	}
+</style>

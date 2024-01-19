@@ -1,0 +1,57 @@
+---
+import conf from '../config.json';
+import MediaLinks from './MediaLinks.astro';
+
+type Media = keyof typeof conf.infos.socials;
+---
+
+<footer>
+	<div class="main">
+		<a class="title" href="/">{conf.infos.author} Portfolio</a>
+		<span>
+			&copy; {new Date().getFullYear()}
+			{conf.infos.author} | Theme from <strong class="gradient">
+				<a href="https://astro.build">Astro</a>
+			</strong>
+		</span>
+	</div>
+	<span class="media">
+		{
+			Object.entries(conf.infos.socials).map(([key, value]) => {
+				const media = key as Media;
+				return <MediaLinks media={media} value={value} />;
+			})
+		}
+	</span>
+</footer>
+
+<style>
+	footer {
+		display: flex;
+		justify-content: space-between;
+		background: #1b1d25;
+		border-top: 1px solid #575d6e;
+		color: #fff8;
+		height: 6rem;
+		padding: 0.5rem 1rem;
+	}
+	a,
+	a:hover {
+		text-decoration: none;
+		color: rgba(var(--accent-light));
+	}
+	.media {
+		display: flex;
+		align-items: end;
+		gap: 0.5rem;
+	}
+	.main {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+	.title {
+		font-size: larger;
+		font-weight: bold;
+	}
+</style>
