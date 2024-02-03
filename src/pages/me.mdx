@@ -4,13 +4,11 @@ title: 'About me'
 author: 'Roland ZHU'
 ---
 
-import conf from "../config.json"
-
-export const age = new Date().getFullYear() - conf.infos.bornYear;
+import conf from "../config.json";
+import { calculateAge } from "../utils/calculate-age";
 
 [&larr; Go back to home page](/)
 
 ## Me
 
-Hello I'm {frontmatter.author}, I'm {age} years old, I'm a full-stack developper.
-
+Hello I'm {conf.infos.author}, I'm {calculateAge(conf.infos.birthdate)} years old, I'm a full-stack developper.
