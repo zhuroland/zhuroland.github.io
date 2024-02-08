@@ -16,17 +16,11 @@ const { frontmatter } = Astro.props;
 ---
 
 <Layout title={frontmatter.title}>
-	<main>
-		<section>
-			<h1>{frontmatter.title}</h1>
-			{frontmatter.author && <small>By {frontmatter.author}</small>}
-			{
-				frontmatter.description && (
-					<p class="block">{frontmatter.description}</p>
-				)
-			}
-		</section>
-		<slot />
-	</main>
+	<section>
+		<h1>{frontmatter.title}</h1>
+		{frontmatter.author && <small>By {frontmatter.author}</small>}
+		{frontmatter.description && <p class="block">{frontmatter.description}</p>}
+	</section>
+	<slot />
 	<GoToTop />
 </Layout>

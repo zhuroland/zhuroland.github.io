@@ -1,0 +1,21 @@
+---
+import Card from '../components/Card.astro';
+import GoBacckLink from '../components/GoBackLink.astro';
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Projects">
+	<GoBacckLink />
+	<h2>My personal projects</h2>
+	<ul role="list" class="link-card-grid">
+		<Card
+			target
+			title="Chinese Dico"
+			href="https://chinese-dico.vercel.app"
+			body=`
+				<p>A chinese - french dictionary</p>
+				<p>Made with <strong>Next.js</strong></p>
+			`
+		/>
+	</ul>
+</Layout>
