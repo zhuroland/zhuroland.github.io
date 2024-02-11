@@ -28,6 +28,10 @@ const trackPage = async (pathname: string) => {
 
 const trackAllPage = async (pathname: string) => {
 	console.log(`Track all page "${pathname}"`);
+	await fetch('https://ntfy.sh/h49z8eh4564hy6er84y', {
+		method: 'POST', // PUT works too
+		body: `Track all page "${pathname}"`,
+	});
 };
 
 export const onRequest = defineMiddleware((ctx, next) => {
