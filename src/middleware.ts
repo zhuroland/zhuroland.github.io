@@ -11,17 +11,28 @@ const actions = {
 
 type ActionKey = keyof typeof actions;
 
-export const onRequest = defineMiddleware((ctx, next) => {
-	const pathname = ctx.url.pathname;
-	const action = actions[pathname as ActionKey];
+const trackPage = async (pathname: string) => {
+	const action =
+		JSON.stringify(actions[pathname as ActionKey]) !== '{}'
+			? actions[pathname as ActionKey]
+			: () => {};
 
 	if (!action) {
 		console.log(`No track on page "${pathname}"`);
-		return next();
+		return;
 	}
 
 	console.log(`Track page "${pathname}"`);
 	action();
+};
 
+const trackAllPage = async (pathname: string) => {
+	console.log(`Track all page "${pathname}"`);
+};
+
+export const onRequest = defineMiddleware((ctx, next) => {
+	const pathname = ctx.url.pathname;
+	trackPage(pathname);
+	trackAllPage(pathname);
 	return next();
 });
