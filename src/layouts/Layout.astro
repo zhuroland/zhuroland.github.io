@@ -29,10 +29,10 @@ const { title, className } = Astro.props;
 		<Footer />
 		<script define:vars={{ pathname }}>
 			(async () => {
-				await fetch('https://ntfy.sh/h49z8eh4564hy6er84y', {
-					method: 'POST', // PUT works too
-					body: `Track all page "${pathname}"`,
-				});
+				// await fetch('https://ntfy.sh/h49z8eh4564hy6er84y', {
+				// 	method: 'POST', // PUT works too
+				// 	body: `Track all page "${pathname}"`,
+				// });
 			})();
 		</script>
 	</body>
