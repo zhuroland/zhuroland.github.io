@@ -1,0 +1,13 @@
+---
+type Props = {
+	title: string;
+};
+
+const { title } = Astro.props;
+---
+
+<h2>{title}</h2>
+
+<ul role="list" class="link-card-grid">
+	<slot />
+</ul>

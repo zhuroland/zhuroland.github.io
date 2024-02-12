@@ -2,7 +2,7 @@
 interface Props {
 	title: string;
 	body: string;
-	href: string;
+	href?: string;
 	target?: boolean;
 }
 
@@ -13,7 +13,7 @@ const { href, title, body, target } = Astro.props;
 	<a href={href} target={target ? '_blank' : ''}>
 		<h2>
 			{title}
-			<span>&rarr;</span>
+			{href && <span>&rarr;</span>}
 		</h2>
 		<p set:html={body} />
 	</a>

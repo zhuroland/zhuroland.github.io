@@ -1,21 +1,42 @@
 ---
 import Card from '../components/Card.astro';
 import GoBacckLink from '../components/GoBackLink.astro';
+import ListProject from '../components/ListProject.astro';
 import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="Projects">
 	<GoBacckLink />
-	<h2>My personal projects</h2>
-	<ul role="list" class="link-card-grid">
+	<ListProject title="My personal projects">
 		<Card
 			target
 			title="Chinese Dico"
 			href="https://chinese-dico.vercel.app"
 			body=`
-				<p>A chinese - french dictionary</p>
+					<p>A Chinese - French dictionary</p>
+					<p>Made with <strong>Next.js</strong></p>
+				`
+		/>
+	</ListProject>
+	<ListProject title="My group projects">
+		<Card
+			target
+			title="KRYP Ticket"
+			href="https://kryp-ticket.vercel.app"
+			body=`
+				<p>A ticket system made for student, to help each other.</p>
 				<p>Made with <strong>Next.js</strong></p>
+				<small>Worked on with <strong>Khai</strong></small>
 			`
 		/>
-	</ul>
+	</ListProject>
+	<ListProject title="My school projects">
+		<Card
+			title="Hyrule Castle"
+			body=`
+				<p>A game on terminal, we need to beat the enemie to get on the next floor. There's many characters with different abilities</p>
+				<p>Made with <strong>Typescript</strong></p>
+			`
+		/>
+	</ListProject>
 </Layout>
