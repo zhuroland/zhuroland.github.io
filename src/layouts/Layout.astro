@@ -7,8 +7,6 @@ interface Props {
 	className?: string;
 }
 
-const pathname = Astro.url.pathname;
-
 const { title, className } = Astro.props;
 ---
 
@@ -27,14 +25,6 @@ const { title, className } = Astro.props;
 			<slot />
 		</main>
 		<Footer />
-		<script define:vars={{ pathname }}>
-			(async () => {
-				// await fetch('https://ntfy.sh/h49z8eh4564hy6er84y', {
-				// 	method: 'POST', // PUT works too
-				// 	body: `Track all page "${pathname}"`,
-				// });
-			})();
-		</script>
 	</body>
 </html>
 

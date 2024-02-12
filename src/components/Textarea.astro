@@ -1,0 +1,62 @@
+---
+import { randomUUID } from 'crypto';
+type Props = {
+	label?: string;
+} & astroHTML.JSX.TextareaHTMLAttributes;
+
+const { label, ...props } = Astro.props;
+const uuid = randomUUID().toString();
+---
+
+<div>
+	{label !== undefined && <label for={uuid}>{label}</label>}
+	<textarea {...props} id={uuid}></textarea>
+</div>
+
+<script defer define:vars={{ uuid }}>
+	const element = document.getElementById(`${uuid}`);
+
+	element.addEventListener('keyup', (e) => {
+		const line = e.target.value.split('\n').reduce((acc, _) => acc + 1, 0);
+
+		element.rows = line;
+	});
+</script>
+
+<style>
+	div {
+		width: 100%;
+		list-style: none;
+		display: grid;
+		padding: 1px;
+		background-color: #23262d;
+		background-image: none;
+		background-size: 400%;
+		border-radius: 7px;
+		background-position: 100%;
+		transition: background-position 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+		box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+	}
+	label {
+		padding: 0.5rem;
+		background-color: #23262d50;
+		border-radius: 7px;
+	}
+	textarea {
+		border: none;
+		border-radius: 8px;
+		color: white;
+		background-color: #23262d;
+		padding: 1rem;
+		opacity: 0.8;
+		font-size: large;
+		border-top: 1px solid rgba(255, 255, 255, 0.1);
+	}
+	div:is(:focus, :focus-within) {
+		background-position: 0;
+		background-image: var(--accent-gradient);
+	}
+	div:is(:focus, :focus-within) h2 {
+		color: rgb(var(--accent-light));
+	}
+</style>

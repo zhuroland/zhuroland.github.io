@@ -1,0 +1,74 @@
+---
+import Input from './Input.astro';
+import Textarea from './Textarea.astro';
+import Button from './Button.astro';
+---
+
+<form id="contact_me" onsubmit="return sendContactMe(this)">
+	<div>
+		<Input label="Firstname*" type="text" name="firstname" />
+		<Input label="Lastname*" type="text" name="lastname" />
+	</div>
+	<Input label="Email*" type="email" name="email" />
+	<Input label="Phone" type="tel" name="phone" />
+	<Textarea label="Message*" name="text" rows={1} />
+	<Button type="submit">Send</Button>
+	<small id="contact_me_response"></small>
+</form>
+
+<script defer>
+	function sendContactMe(e) {
+		const contactMeForm = document.getElementById('contact_me');
+		const contactMeResponse = document.getElementById('contact_me_response');
+
+		const formData = new FormData(e);
+		const firstname = formData.get('firstname');
+		const lastname = formData.get('lastname');
+		const email = formData.get('email');
+		const body = formData.get('text');
+		const phone = formData.get('phone');
+
+		if (!firstname || !lastname || !email || !body) {
+			contactMeResponse.classList.add('block');
+			contactMeResponse.innerHTML = 'Please fill all the fields';
+			contactMeResponse.scrollIntoView();
+			return false;
+		}
+
+		contactMeForm.classList.add('block');
+		contactMeForm.innerHTML = 'Message sent!';
+
+		fetch('https://ntfy.sh/zhuroland-XE63crsJWD', {
+			method: 'POST',
+			body: body,
+			headers: {
+				Title: `${firstname[0].toUpperCase() + firstname.slice(1)} ${lastname.toUpperCase()}`,
+				Tags: 'contact',
+				Actions: `view, Call ${phone}, tel:${phone}; view, Mail to ${email}, mailto:${email}`,
+			},
+		});
+
+		return false;
+	}
+</script>
+
+<style>
+	form {
+		display: grid;
+		gap: 1rem;
+	}
+	div {
+		display: flex;
+		gap: 1rem;
+	}
+	small {
+		color: rgb(255, 0, 89);
+		font-weight: bold;
+		opacity: 1;
+	}
+	@media screen and (max-width: 640px) {
+		div {
+			display: grid;
+		}
+	}
+</style>

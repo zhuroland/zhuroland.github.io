@@ -1,13 +1,15 @@
 ---
 import MediaIcons from './MediaIcons.astro';
 import type { Media } from '../types/media';
+import { strCapitalize } from '../utils';
 
 type Props = {
 	media: Media;
 	value: string;
+	iconMode?: boolean;
 };
 
-const { media, value } = Astro.props;
+const { media, value, iconMode = false } = Astro.props;
 
 let url = '';
 
@@ -29,20 +31,20 @@ switch (media) {
 
 {
 	url && (
-		<a href={url} target="_blank">
-			<MediaIcons icon={media} />
+		<a href={url} target="_blank" class={iconMode ? 'icon' : ''}>
+			{iconMode ? <MediaIcons icon={media} /> : strCapitalize(media)}
 		</a>
 	)
 }
 
 <style>
-	a {
+	.icon {
 		display: flex;
 		justify-content: center;
 		align-items: center;
 		color: #fff8;
 	}
-	a:hover {
+	.icon:hover {
 		color: rgba(var(--accent-light));
 	}
 </style>

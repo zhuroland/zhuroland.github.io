@@ -19,7 +19,7 @@ type Media = keyof typeof conf.infos.socials;
 		{
 			Object.entries(conf.infos.socials).map(([key, value]) => {
 				const media = key as Media;
-				return <MediaLinks media={media} value={value} />;
+				return <MediaLinks media={media} value={value} iconMode />;
 			})
 		}
 	</span>
