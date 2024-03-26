@@ -6,17 +6,13 @@ import Card from '../components/Card.astro';
 <Layout title="Home Page">
 	<h1>Welcome to my <span class="gradient">Portfolio</span></h1>
 	<ul role="list" class="link-card-grid">
-		<Card
-			href="/docs/astro"
-			title="Documentation"
-			body="Learn how Astro works and explore the official API docs."
-		/>
-		<Card
-			href="/projects"
-			title="My projects"
-			body="All the projects that I made."
-		/>
-		<Card href="/me" title="About me" body="A summary about myself." />
-		<Card href="/contactme" title="Contact me" body="Send me a message :)" />
+		<Card href="/docs/astro" title="Documentation"
+			>Learn how Astro works and explore the official API docs.</Card
+		>
+		<Card href="/projects" title="My projects"
+			>All the projects that I made.</Card
+		>
+		<Card href="/me" title="About me"> A summary about myself.</Card>
+		<Card href="/contactme" title="Contact me"> Send me a message :)</Card>
 	</ul>
 </Layout>
