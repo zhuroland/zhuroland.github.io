@@ -16,7 +16,7 @@ import Button from './Button.astro';
 	<small id="contact_me_response"></small>
 </form>
 
-<script defer>
+<script is:inline defer>
 	function sendContactMe(e) {
 		const contactMeForm = document.getElementById('contact_me');
 		const contactMeResponse = document.getElementById('contact_me_response');
@@ -65,6 +65,9 @@ import Button from './Button.astro';
 		color: rgb(255, 0, 89);
 		font-weight: bold;
 		opacity: 1;
+	}
+	textarea {
+		resize: vertical;
 	}
 	@media screen and (max-width: 640px) {
 		div {
