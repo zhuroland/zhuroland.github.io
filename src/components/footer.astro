@@ -3,8 +3,12 @@ import conf from '../../config.json';
 ---
 
 <footer>
-	<p>Theme by <b>Astro</b></p>
-	<p>&copy; {new Date().getFullYear()} {conf.infos.author}</p>
+	<p>
+		Theme <a target="_blank" href="https://starlight.astro.build/"
+			><b>Starlight</b></a
+		> by <a target="_blank" href="https://astro.build/"><b>Astro</b></a>
+	</p>
+	<p>&copy; {new Date().getFullYear()} <b>{conf.infos.author}</b></p>
 </footer>
 
 <style>
@@ -12,6 +16,8 @@ import conf from '../../config.json';
 		display: flex;
 		align-items: baseline;
 		justify-content: space-between;
+		max-width: 67.5rem;
 		padding-top: 3rem;
+		margin-inline: auto;
 	}
 </style>
