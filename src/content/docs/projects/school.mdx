@@ -1,0 +1,26 @@
+---
+layout: '../../../layouts/DocsLayout.astro'
+title: My school projects
+author: Roland ZHU
+---
+
+import { CardGrid } from '@astrojs/starlight/components';
+import Card from '../../../components/my-card.astro';
+
+<CardGrid>
+	<Card title="Hyrule Castle">
+			<p>
+				A game on terminal, we need to beat the enemie to get on the next floor.
+				There's many characters with different abilities
+			</p>
+			<p>Made with <strong>Typescript</strong></p>
+		</Card>
+		<Card title="Free GG">
+			<p>
+				A mobile application that lists all free games using the
+				<a href="https://www.freetogame.com/api-doc" target="_blank"
+					>FreeToGame API</a>.
+			</p>
+			<p>Made with <strong>Expo</strong></p>
+		</Card>
+</CardGrid>

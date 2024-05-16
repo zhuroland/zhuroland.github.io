@@ -1,0 +1,44 @@
+---
+import type { Icons } from './icons';
+import { Card } from '@astrojs/starlight/components';
+
+type Props = {
+	title: string;
+	icon: Icons;
+	href?: string;
+	target?: boolean;
+};
+
+const { href, target, title, icon } = Astro.props;
+---
+
+{
+	href ? (
+		<a href={href} target={target ? '_blank' : ''}>
+			<Card
+				title={`${title}
+				<svg aria-hidden="true" style="display: inline;     vertical-align: middle;" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" data-astro-source-file="/home/roland/Dev/personal/zhuroland.github.io-/node_modules/.pnpm/@astrojs+starlight@0.22.3_astro@4.8.4/node_modules/@astrojs/starlight/user-components/Icon.astro" data-astro-source-loc="16:2"><path d="M19.33 10.18a1 1 0 0 1-.77 0 1 1 0 0 1-.62-.93l.01-1.83-8.2 8.2a1 1 0 0 1-1.41-1.42l8.2-8.2H14.7a1 1 0 0 1 0-2h4.25a1 1 0 0 1 1 1v4.25a1 1 0 0 1-.62.93Z"></path><path d="M11 4a1 1 0 1 1 0 2H7a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-4a1 1 0 1 1 2 0v4a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h4Z"></path></svg>`}
+				icon={icon}
+			>
+				<slot />
+			</Card>
+		</a>
+	) : (
+		<Card title={title} icon={icon}>
+			<slot />
+		</Card>
+	)
+}
+
+<style>
+	a {
+		text-decoration: none;
+		color: inherit !important;
+		width: fit-content;
+		height: fit-content;
+	}
+	a:hover {
+		color: inherit !important;
+		box-shadow: 0 0 0 1px #0070f3;
+	}
+</style>
