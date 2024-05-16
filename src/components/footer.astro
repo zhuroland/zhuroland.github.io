@@ -1,0 +1,17 @@
+---
+import conf from '../../config.json';
+---
+
+<footer>
+	<p>Theme by <b>Astro</b></p>
+	<p>&copy; {new Date().getFullYear()} {conf.infos.author}</p>
+</footer>
+
+<style>
+	footer {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		padding-top: 3rem;
+	}
+</style>

@@ -1,0 +1,47 @@
+---
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { CardGrid } from '@astrojs/starlight/components';
+import Card from '../components/my-card.astro';
+import Footer from '../components/footer.astro';
+import cont from '../../config.json';
+import Image from '../assets/houston.webp';
+---
+
+<StarlightPage
+	frontmatter={{
+		title: 'Welcome to My portfolio',
+		description: `This is a portfolio website created by ${cont.infos.author}.`,
+		template: 'splash',
+		hero: {
+			tagline: `Hello, I'm ${cont.infos.author}, a Full Stack Developer.`,
+			image: {
+				file: Image,
+			},
+			actions: [
+				{
+					text: 'Explore more',
+					link: '/about',
+					icon: 'right-arrow',
+					variant: 'primary',
+				},
+			],
+		},
+	}}
+>
+	<CardGrid stagger>
+		<Card title="Documentation" icon="document" href="/documentation/astro">
+			Here you can find all the documentation that I have written or collected.
+		</Card>
+		<Card title="My projects" icon="seti:html" href="/projects/personal">
+			Discover all the projects I have worked on.
+		</Card>
+		<Card title="Contact me" icon="pen" href="/contact">
+			You can contact me here. I will be happy to answer you.
+		</Card>
+		<Card title="About me" icon="open-book" href="/about">
+			A summary of my background and skills.
+		</Card>
+	</CardGrid>
+
+	<Footer />
+</StarlightPage>

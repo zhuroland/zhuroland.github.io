@@ -1,7 +1,7 @@
 ---
 type Frontmatter = {
-	title: string;
-	author?: string;
+	author: string;
+	description: string;
 };
 
 type Props = {
@@ -12,6 +12,7 @@ const { frontmatter } = Astro.props;
 ---
 
 {frontmatter.author && <small>By {frontmatter.author}</small>}
+{frontmatter.description && <p>{frontmatter.description}</p>}
 <slot />
 
 <style is:global>
