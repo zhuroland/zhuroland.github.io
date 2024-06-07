@@ -1,4 +1,6 @@
 ---
+import conf from '../../config.json';
+
 type Frontmatter = {
 	author: string;
 	description: string;
@@ -8,12 +10,24 @@ type Props = {
 	frontmatter: Frontmatter;
 };
 
+const birthdate = conf.infos.birthdate;
 const { frontmatter } = Astro.props;
 ---
 
 {frontmatter.author && <small>By {frontmatter.author}</small>}
 {frontmatter.description && <p>{frontmatter.description}</p>}
 <slot />
+
+<script is:inline define:vars={{ birthdate }}>
+	const calculateAge = () => {
+		const timeDiff = Math.abs(Date.now() - new Date(birthdate).getTime());
+
+		return Math.floor(timeDiff / (1000 * 3600 * 24) / 365.25).toString();
+	};
+
+	const myagespan = document.querySelector('[data-my-age]');
+	if (myagespan) myagespan.textContent = calculateAge();
+</script>
 
 <style is:global>
 	:root {
