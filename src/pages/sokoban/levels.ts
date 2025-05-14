@@ -117,7 +117,7 @@ levels.push({
     "W W    W           W",
     "W WWGW W WWWWWWWWW W",
     "W W  W WWW     G W W",
-    "W W  W     WWW WWW W",
+    "W WB W     WWW WWW W",
     "W WWWW WWWWW W W   W",
     "W      W     W   WWW",
     "W WW WWW WWW W W W W",
