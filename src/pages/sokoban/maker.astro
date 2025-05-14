@@ -949,10 +949,16 @@ import Button from "../../components/button.astro";
         return false;
       }
 
-      if (boxCount !== targetCount) {
-        this.validationMessageElement.textContent = `Warning: Number of boxes (${boxCount}) doesn't match number of targets (${targetCount})!`;
+      if (boxCount < targetCount) {
+        this.validationMessageElement.textContent = `Error: Number of boxes (${boxCount}) cannot be less than number of targets (${targetCount})!`;
         this.validationMessageElement.className = "validation-message error";
         return false;
+      }
+      
+      if (boxCount > targetCount) {
+        this.validationMessageElement.textContent = `Warning: There are more boxes (${boxCount}) than targets (${targetCount}). Some boxes cannot be placed on targets.`;
+        this.validationMessageElement.className = "validation-message error";
+        // This is just a warning, not an error that prevents export
       }
 
       return true;
