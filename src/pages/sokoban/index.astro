@@ -161,8 +161,8 @@ import Button from "../../components/button.astro";
       Math.max(...levels[levelIdx].map.map((row) => row.length)) * TILE_SIZE;
     const maxHeight = levels[levelIdx].map.length * TILE_SIZE;
 
-    canvas.width = Math.max(maxWidth, 400);
-    canvas.height = Math.max(maxHeight + 40, 400); // Extra space for UI text
+    canvas.width = Math.max(maxWidth, 250);
+    canvas.height = Math.max(maxHeight + 40, 250); // Extra space for UI text
   }
 
   function parseLevel(levelMap: string[]): void {
