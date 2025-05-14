@@ -110,3 +110,28 @@ export const levels: Level[] = [
     ],
   },
 ];
+
+levels.push({
+  map: [
+    "WWWWWWWWWWWWWWWWWWWW",
+    "W W    W           W",
+    "W WWGW W WWWWWWWWW W",
+    "W W  W WWW     G W W",
+    "W W  W     WWW WWW W",
+    "W WWWW WWWWW W W   W",
+    "W      W     W   WWW",
+    "W WW WWW WWW W W W W",
+    "W W  W   WTB W W W W",
+    "W WWWW W WWW WWW W W",
+    "W      W   W W   W W",
+    "WWWWWW WWWWWWW WWW W",
+    "W    W W    W  W   W",
+    "WWWW W WWWW W WW W W",
+    "W W    W    W W  W W",
+    "WGWWWWWW WWWW WWWW W",
+    "W        W     G W W",
+    "WWWWWW WWWW WWWWWW W",
+    "WP                 W",
+    "WWWWWWWWWWWWWWWWWWWW",
+  ],
+});
