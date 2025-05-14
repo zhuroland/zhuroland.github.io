@@ -3,10 +3,10 @@ import Button from "../../components/button.astro";
 ---
 
 <div class="navigation">
+  <h1>Sokoban Level Maker</h1>
   <Button href="/games">Go back</Button>
   <Button href="/sokoban">Play Sokoban</Button>
 </div>
-<h1>Sokoban Level Maker</h1>
 
 <div class="maker-container">
   <div class="side-panel">
@@ -34,8 +34,8 @@ import Button from "../../components/button.astro";
       </button>
       <button class="block-button" data-block-type="box_on_target">
         <div class="combined-image">
-          <img src="/assets/sokoban/target.png" alt="Target" />
-          <img src="/assets/sokoban/box.png" alt="Box" class="overlay" />
+          <img src="/assets/sokoban/box.png" alt="Box" />
+          <div class="overlay"></div>
         </div>
         <span>Box on Target</span>
       </button>
@@ -94,7 +94,8 @@ import Button from "../../components/button.astro";
   }
 
   .navigation {
-    display: flex;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
     gap: 1rem;
     margin-bottom: 1rem;
   }
@@ -176,6 +177,9 @@ import Button from "../../components/button.astro";
     top: 0;
     left: 0;
     z-index: 1;
+    background-color: rgba(0, 255, 0, 0.5);
+    width: 100%;
+    height: 100%;
   }
 
   .grid-controls,
