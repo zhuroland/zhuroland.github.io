@@ -1,0 +1,81 @@
+---
+import Button from "../components/button.astro";
+---
+
+<Button href="/">Go back</Button>
+<h1>Game</h1>
+<canvas id="game" width="800" height="600"></canvas>
+<script>
+  interface Game {
+    canvas: HTMLCanvasElement;
+    ctx: CanvasRenderingContext2D;
+    playerX: number;
+    playerY: number;
+    playerWidth: number;
+    playerHeight: number;
+    playerSpeed: number;
+  }
+  class Game implements Game {
+    constructor() {
+      const canvas = document.getElementById("game");
+      if (!canvas) {
+        throw new Error("Canvas element not found");
+      }
+      if (!(canvas instanceof HTMLCanvasElement)) {
+        throw new Error("Element is not a canvas");
+      }
+      canvas.style.border = "1px solid black";
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        throw new Error("Failed to get canvas context");
+      }
+      this.canvas = canvas;
+      this.ctx = ctx;
+      this.playerX = 0;
+      this.playerY = 0;
+      this.playerWidth = 50;
+      this.playerHeight = 50;
+      this.playerSpeed = 5;
+    }
+  }
+  const G = new Game();
+  const canvas = G.canvas;
+  const ctx = G.ctx;
+
+  let playerX = canvas.width / 2;
+  let playerY = canvas.height - 30;
+  let playerWidth = 50;
+  let playerHeight = 50;
+  let playerSpeed = 5;
+
+  function drawPlayer() {
+    ctx.fillStyle = "blue";
+    ctx.fillRect(playerX, playerY, playerWidth, playerHeight);
+  }
+
+  function update() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawPlayer();
+    requestAnimationFrame(update);
+  }
+
+  function gameLoop() {
+    update();
+    drawPlayer();
+    requestAnimationFrame(gameLoop);
+  }
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") {
+      playerX -= playerSpeed;
+    } else if (event.key === "ArrowRight") {
+      playerX += playerSpeed;
+    } else if (event.key === "ArrowUp") {
+      playerY -= playerSpeed;
+    } else if (event.key === "ArrowDown") {
+      playerY += playerSpeed;
+    }
+  });
+
+  gameLoop();
+</script>
