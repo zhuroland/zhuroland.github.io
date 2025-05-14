@@ -80,6 +80,7 @@ import Button from "../../components/button.astro";
     wall: new Image(),
     box: new Image(),
     target: new Image(),
+    ground: new Image(),
   };
 
   // ========================
@@ -116,11 +117,13 @@ import Button from "../../components/button.astro";
     images.wall.onload = loadHandler;
     images.box.onload = loadHandler;
     images.target.onload = loadHandler;
+    images.ground.onload = loadHandler;
 
     images.player.src = "/assets/sokoban/cat.png";
     images.wall.src = "/assets/sokoban/wall.png";
     images.box.src = "/assets/sokoban/box.png";
     images.target.src = "/assets/sokoban/target.png";
+    images.ground.src = "/assets/sokoban/ground.png";
   }
 
   // ========================
@@ -173,6 +176,11 @@ import Button from "../../components/button.astro";
             gameMap[y][x] = "target";
             targets.push({ x, y });
             break;
+          case "G":
+            gameMap[y][x] = "target";
+            boxes.push({ x, y });
+            targets.push({ x, y });
+            break;
           case "P":
             gameMap[y][x] = "floor";
             playerPos = { x, y };
@@ -197,28 +205,31 @@ import Button from "../../components/button.astro";
     const prevLevelButton = document.querySelector("[data-canvas-prev]");
 
     if (restartButton) {
-      restartButton.addEventListener("click", () => {
+      restartButton.addEventListener("click", (e) => {
         initLevel(currentLevel);
+        (e.target as HTMLButtonElement).blur(); // Remove focus from button
       });
     }
 
     if (nextLevelButton) {
-      nextLevelButton.addEventListener("click", () => {
+      nextLevelButton.addEventListener("click", (e) => {
         if (currentLevel < levels.length - 1) {
           initLevel(currentLevel + 1);
         } else {
           initLevel(0);
         }
+        (e.target as HTMLButtonElement).blur(); // Remove focus from button
       });
     }
 
     if (prevLevelButton) {
-      prevLevelButton.addEventListener("click", () => {
+      prevLevelButton.addEventListener("click", (e) => {
         if (currentLevel > 0) {
           initLevel(currentLevel - 1);
         } else {
           initLevel(levels.length - 1);
         }
+        (e.target as HTMLButtonElement).blur(); // Remove focus from button
       });
     }
   }
@@ -363,10 +374,6 @@ import Button from "../../components/button.astro";
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw background
-    ctx.fillStyle = "#f0f0f0";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
     // Draw map (walls and targets)
     for (let y = 0; y < gameMap.length; y++) {
       for (let x = 0; x < gameMap[y].length; x++) {
@@ -374,7 +381,9 @@ import Button from "../../components/button.astro";
         const posX = x * TILE_SIZE;
         const posY = y * TILE_SIZE;
 
-        if (cell === "wall") {
+        if (cell === "floor") {
+          ctx.drawImage(images.ground, posX, posY, TILE_SIZE, TILE_SIZE);
+        } else if (cell === "wall") {
           ctx.drawImage(images.wall, posX, posY, TILE_SIZE, TILE_SIZE);
         } else if (cell === "target") {
           ctx.drawImage(images.target, posX, posY, TILE_SIZE, TILE_SIZE);
