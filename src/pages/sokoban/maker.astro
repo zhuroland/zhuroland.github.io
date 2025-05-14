@@ -68,7 +68,7 @@ import Button from "../../components/button.astro";
       <textarea id="export-code" readonly rows="5"></textarea>
       <div class="validation-message" id="validation-message"></div>
     </div>
-    
+
     <div class="help-section">
       <h3>Keyboard Shortcuts</h3>
       <div class="shortcuts">
@@ -92,7 +92,7 @@ import Button from "../../components/button.astro";
   * {
     box-sizing: border-box;
   }
-  
+
   .navigation {
     display: flex;
     gap: 1rem;
@@ -178,7 +178,8 @@ import Button from "../../components/button.astro";
     z-index: 1;
   }
 
-  .grid-controls, .actions {
+  .grid-controls,
+  .actions {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -288,13 +289,13 @@ import Button from "../../components/button.astro";
   .validation-message.success {
     color: #38a169;
   }
-  
+
   .help-section {
     margin-top: 1rem;
     border-top: 1px solid #ddd;
     padding-top: 1rem;
   }
-  
+
   .shortcuts {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -302,7 +303,7 @@ import Button from "../../components/button.astro";
     margin-top: 0.5rem;
     font-size: 0.9rem;
   }
-  
+
   .tip {
     margin-top: 0.5rem;
     font-size: 0.9rem;
@@ -314,7 +315,7 @@ import Button from "../../components/button.astro";
     .maker-container {
       flex-direction: column;
       height: auto;
-      max-height: none; 
+      max-height: none;
     }
 
     .side-panel {
@@ -325,7 +326,13 @@ import Button from "../../components/button.astro";
 
 <script>
   // Define types
-  type CellType = "floor" | "wall" | "target" | "box" | "player" | "box_on_target";
+  type CellType =
+    | "floor"
+    | "wall"
+    | "target"
+    | "box"
+    | "player"
+    | "box_on_target";
 
   interface Cell {
     type: CellType;
@@ -347,52 +354,52 @@ import Button from "../../components/button.astro";
     constructor() {
       // Initialize DOM elements
       this.gridElement = document.getElementById("level-grid") as HTMLElement;
-      this.exportCodeElement = document.getElementById("export-code") as HTMLTextAreaElement;
-      this.validationMessageElement = document.getElementById("validation-message") as HTMLElement;
+      this.exportCodeElement = document.getElementById(
+        "export-code"
+      ) as HTMLTextAreaElement;
+      this.validationMessageElement = document.getElementById(
+        "validation-message"
+      ) as HTMLElement;
 
       // Set up event listeners
       this.setupEventListeners();
 
       // Initialize the grid
       this.createGrid();
-      
+
       // Add document-level events for painting
       document.addEventListener("mouseup", () => this.stopPainting());
       document.addEventListener("mouseleave", () => this.stopPainting());
-      
+
       // Add event listener to the grid container for better drag handling
       this.gridElement.addEventListener("mousemove", (e) => {
         if (this.isPainting) {
           // Find the cell under the current mouse position
-          const cell = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement;
+          const cell = document.elementFromPoint(
+            e.clientX,
+            e.clientY
+          ) as HTMLElement;
           if (cell && cell.classList.contains("grid-cell")) {
             const x = parseInt(cell.dataset.x || "-1");
             const y = parseInt(cell.dataset.y || "-1");
-            if (x >= 0 && y >= 0 && (this.selectedBlockType !== "player" || !this.playerPosition)) {
+            // Simplified condition to allow drag-painting for all block types
+            if (x >= 0 && y >= 0) {
               this.handleCellClick(x, y);
             }
           }
         }
       });
     }
-    
-    private startPainting(): void {
-      this.isPainting = true;
-    }
-    
-    private stopPainting(): void {
-      this.isPainting = false;
-    }
-    
+
     // Track current painting coordinates to prevent duplicates
     private lastPaintedX: number = -1;
     private lastPaintedY: number = -1;
-    
+
     private selectBlockType(type: CellType): void {
       this.selectedBlockType = type;
-      
+
       // Update UI to reflect the selection
-      document.querySelectorAll(".block-button").forEach(button => {
+      document.querySelectorAll(".block-button").forEach((button) => {
         button.classList.remove("selected");
         if (button.getAttribute("data-block-type") === type) {
           button.classList.add("selected");
@@ -403,14 +410,16 @@ import Button from "../../components/button.astro";
     private setupEventListeners(): void {
       // Block type selection
       const blockButtons = document.querySelectorAll(".block-button");
-      blockButtons.forEach(button => {
+      blockButtons.forEach((button) => {
         button.addEventListener("click", () => {
-          blockButtons.forEach(b => b.classList.remove("selected"));
+          blockButtons.forEach((b) => b.classList.remove("selected"));
           button.classList.add("selected");
-          this.selectedBlockType = button.getAttribute("data-block-type") as CellType;
+          this.selectedBlockType = button.getAttribute(
+            "data-block-type"
+          ) as CellType;
         });
       });
-      
+
       // Keyboard shortcuts
       document.addEventListener("keydown", (e) => {
         switch (e.key) {
@@ -440,18 +449,29 @@ import Button from "../../components/button.astro";
 
       // Grid controls
       document.getElementById("resize-grid")?.addEventListener("click", () => {
-        const widthInput = document.getElementById("grid-width") as HTMLInputElement;
-        const heightInput = document.getElementById("grid-height") as HTMLInputElement;
+        const widthInput = document.getElementById(
+          "grid-width"
+        ) as HTMLInputElement;
+        const heightInput = document.getElementById(
+          "grid-height"
+        ) as HTMLInputElement;
         const newWidth = parseInt(widthInput.value);
         const newHeight = parseInt(heightInput.value);
 
-        if (newWidth >= 5 && newWidth <= 20 && newHeight >= 5 && newHeight <= 20) {
+        if (
+          newWidth >= 5 &&
+          newWidth <= 20 &&
+          newHeight >= 5 &&
+          newHeight <= 20
+        ) {
           this.gridWidth = newWidth;
           this.gridHeight = newHeight;
           this.createGrid();
         }
       });
-
+      document.addEventListener("mousedown", (e) => this.handleMouseDown(e));
+      document.addEventListener("mousemove", (e) => this.handleMouseMove(e));
+      document.addEventListener("mouseup", () => this.stopPainting());
       // Action buttons
       document.getElementById("clear-grid")?.addEventListener("click", () => {
         this.clearGrid();
@@ -464,6 +484,45 @@ import Button from "../../components/button.astro";
       document.getElementById("export-level")?.addEventListener("click", () => {
         this.exportLevel();
       });
+    }
+
+    private handleMouseDown(e: MouseEvent): void {
+      const cell = this.getEventCell(e);
+      if (cell) {
+        this.startPainting();
+        this.handleCellClick(cell.x, cell.y);
+      }
+    }
+
+    private handleMouseMove(e: MouseEvent): void {
+      if (!this.isPainting) return;
+      const cell = this.getEventCell(e);
+      if (cell) {
+        this.handleCellClick(cell.x, cell.y);
+      }
+    }
+
+    private getEventCell(e: MouseEvent): { x: number; y: number } | null {
+      const target = e.target as HTMLElement;
+      const cellElement = target.closest(".grid-cell") as HTMLElement | null;
+      if (!cellElement) return null;
+
+      const x = parseInt(cellElement.dataset.x || "-1");
+      const y = parseInt(cellElement.dataset.y || "-1");
+      if (x >= 0 && y >= 0 && x < this.gridWidth && y < this.gridHeight) {
+        return { x, y };
+      }
+      return null;
+    }
+
+    private startPainting(): void {
+      this.isPainting = true;
+      this.lastPaintedX = -1;
+      this.lastPaintedY = -1;
+    }
+
+    private stopPainting(): void {
+      this.isPainting = false;
     }
 
     private createGrid(): void {
@@ -488,7 +547,7 @@ import Button from "../../components/button.astro";
           // Set default cell type
           this.grid[y][x] = {
             type: "floor",
-            element: cell
+            element: cell,
           };
 
           // Add image
@@ -506,7 +565,7 @@ import Button from "../../components/button.astro";
             this.handleCellClick(x, y);
             this.startPainting();
           });
-          
+
           // We'll use the grid-level mousemove event instead of individual cell events
           // This prevents issues with fast mouse movement skipping cells
 
@@ -517,26 +576,31 @@ import Button from "../../components/button.astro";
 
     private handleCellClick(x: number, y: number): void {
       // Skip if trying to paint same cell twice in a row during painting
-      if (this.isPainting && x === this.lastPaintedX && y === this.lastPaintedY) {
+      if (
+        this.isPainting &&
+        x === this.lastPaintedX &&
+        y === this.lastPaintedY
+      ) {
         return;
       }
-      
+
       // Update tracking variables
       this.lastPaintedX = x;
       this.lastPaintedY = y;
-      
+
       // Make sure x and y are within grid bounds
       if (y < 0 || y >= this.gridHeight || x < 0 || x >= this.gridWidth) {
         return;
       }
-      
+
       const cell = this.grid[y][x];
 
       // Handle player placement (can only be placed once)
       if (this.selectedBlockType === "player") {
         if (this.playerPosition) {
           // Remove previous player
-          const prevCell = this.grid[this.playerPosition.y][this.playerPosition.x];
+          const prevCell =
+            this.grid[this.playerPosition.y][this.playerPosition.x];
           prevCell.type = "floor";
           this.setCellToType(prevCell.element, "floor");
         }
@@ -545,7 +609,7 @@ import Button from "../../components/button.astro";
 
       // Update cell type
       cell.type = this.selectedBlockType;
-      
+
       // Update cell appearance
       this.setCellToType(cell.element, this.selectedBlockType);
     }
@@ -605,7 +669,7 @@ import Button from "../../components/button.astro";
           targetImg.style.width = "100%";
           targetImg.style.height = "100%";
           targetImg.style.imageRendering = "pixelated";
-          
+
           const boxImg = document.createElement("img");
           boxImg.src = "/assets/sokoban/box.png";
           boxImg.alt = "Box";
@@ -616,7 +680,7 @@ import Button from "../../components/button.astro";
           boxImg.style.height = "100%";
           boxImg.style.zIndex = "1";
           boxImg.style.imageRendering = "pixelated";
-          
+
           // Add green mask overlay
           const greenMask = document.createElement("div");
           greenMask.style.position = "absolute";
@@ -650,7 +714,12 @@ import Button from "../../components/button.astro";
       for (let y = 0; y < this.gridHeight; y++) {
         for (let x = 0; x < this.gridWidth; x++) {
           // Check if cell is on the border
-          if (x === 0 || y === 0 || x === this.gridWidth - 1 || y === this.gridHeight - 1) {
+          if (
+            x === 0 ||
+            y === 0 ||
+            x === this.gridWidth - 1 ||
+            y === this.gridHeight - 1
+          ) {
             const cell = this.grid[y][x];
             cell.type = "wall";
             this.setCellToType(cell.element, "wall");
@@ -666,12 +735,12 @@ import Button from "../../components/button.astro";
       }
 
       let levelMap: string[] = [];
-      
+
       for (let y = 0; y < this.gridHeight; y++) {
         let row = "";
         for (let x = 0; x < this.gridWidth; x++) {
           const cell = this.grid[y][x];
-          
+
           switch (cell.type) {
             case "wall":
               row += "W";
@@ -695,19 +764,21 @@ import Button from "../../components/button.astro";
         }
         levelMap.push(`"${row}",`);
       }
-      
+
       const levelCode = `{\n  map: [\n    ${levelMap.join("\n    ")}\n  ],\n},`;
       this.exportCodeElement.value = levelCode;
-      
+
       // Show success message
-      this.validationMessageElement.textContent = "Level exported successfully! Copy this code to your levels.ts file.";
+      this.validationMessageElement.textContent =
+        "Level exported successfully! Copy this code to your levels.ts file.";
       this.validationMessageElement.className = "validation-message success";
     }
 
     private validateLevel(): boolean {
       // Check if player exists
       if (!this.playerPosition) {
-        this.validationMessageElement.textContent = "Error: Level must have a player!";
+        this.validationMessageElement.textContent =
+          "Error: Level must have a player!";
         this.validationMessageElement.className = "validation-message error";
         return false;
       }
@@ -730,7 +801,8 @@ import Button from "../../components/button.astro";
 
       // Check if boxes match targets
       if (boxCount === 0 || targetCount === 0) {
-        this.validationMessageElement.textContent = "Error: Level must have at least one box and one target!";
+        this.validationMessageElement.textContent =
+          "Error: Level must have at least one box and one target!";
         this.validationMessageElement.className = "validation-message error";
         return false;
       }
