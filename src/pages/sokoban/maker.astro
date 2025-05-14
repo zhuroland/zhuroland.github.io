@@ -1,0 +1,752 @@
+---
+import Button from "../../components/button.astro";
+---
+
+<div class="navigation">
+  <Button href="/games">Go back</Button>
+  <Button href="/sokoban">Play Sokoban</Button>
+</div>
+<h1>Sokoban Level Maker</h1>
+
+<div class="maker-container">
+  <div class="side-panel">
+    <h3>Blocks</h3>
+    <div class="block-selector">
+      <button class="block-button selected" data-block-type="floor">
+        <img src="/assets/sokoban/ground.png" alt="Floor" />
+        <span>Floor</span>
+      </button>
+      <button class="block-button" data-block-type="wall">
+        <img src="/assets/sokoban/wall.png" alt="Wall" />
+        <span>Wall</span>
+      </button>
+      <button class="block-button" data-block-type="target">
+        <img src="/assets/sokoban/target.png" alt="Target" />
+        <span>Target</span>
+      </button>
+      <button class="block-button" data-block-type="box">
+        <img src="/assets/sokoban/box.png" alt="Box" />
+        <span>Box</span>
+      </button>
+      <button class="block-button" data-block-type="player">
+        <img src="/assets/sokoban/cat.png" alt="Player" />
+        <span>Player</span>
+      </button>
+      <button class="block-button" data-block-type="box_on_target">
+        <div class="combined-image">
+          <img src="/assets/sokoban/target.png" alt="Target" />
+          <img src="/assets/sokoban/box.png" alt="Box" class="overlay" />
+        </div>
+        <span>Box on Target</span>
+      </button>
+    </div>
+
+    <div class="grid-controls">
+      <h3>Grid Size</h3>
+      <div class="grid-size">
+        <label>
+          Width:
+          <input type="number" id="grid-width" min="5" max="20" value="10" />
+        </label>
+        <label>
+          Height:
+          <input type="number" id="grid-height" min="5" max="20" value="10" />
+        </label>
+        <button id="resize-grid">Resize Grid</button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <h3>Actions</h3>
+      <button id="clear-grid">Clear Grid</button>
+      <button id="fill-walls">Fill Border with Walls</button>
+      <button id="export-level">Export Level</button>
+    </div>
+
+    <div class="export-area">
+      <h3>Export</h3>
+      <textarea id="export-code" readonly rows="5"></textarea>
+      <div class="validation-message" id="validation-message"></div>
+    </div>
+    
+    <div class="help-section">
+      <h3>Keyboard Shortcuts</h3>
+      <div class="shortcuts">
+        <div><strong>F</strong>: Floor</div>
+        <div><strong>W</strong>: Wall</div>
+        <div><strong>T</strong>: Target</div>
+        <div><strong>B</strong>: Box</div>
+        <div><strong>P</strong>: Player</div>
+        <div><strong>G</strong>: Box on Target</div>
+      </div>
+      <p class="tip">Tip: Click and drag to paint multiple tiles!</p>
+    </div>
+  </div>
+
+  <div class="grid-container">
+    <div class="grid" id="level-grid"></div>
+  </div>
+</div>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+  
+  .navigation {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .maker-container {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    height: calc(100vh - 150px);
+    max-height: 800px;
+  }
+
+  .side-panel {
+    width: 250px;
+    min-width: 250px;
+    background-color: #f0f0f0;
+    padding: 1rem;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+  }
+
+  .block-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .block-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .block-button:hover {
+    border-color: #aaa;
+  }
+
+  .block-button.selected {
+    border-color: #4a5568;
+    background-color: #e2e8f0;
+  }
+
+  .block-button img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+
+  .block-button span {
+    margin-top: 0.25rem;
+    font-size: 0.8rem;
+    text-align: center;
+  }
+
+  .combined-image {
+    position: relative;
+    width: 40px;
+    height: 40px;
+  }
+
+  .combined-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .combined-image .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+  }
+
+  .grid-controls, .actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .grid-size {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .grid-size label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .grid-size input {
+    width: 60px;
+    padding: 0.25rem;
+  }
+
+  button {
+    padding: 0.5rem;
+    background-color: #4a5568;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+
+  button:hover {
+    background-color: #2d3748;
+  }
+
+  .grid-container {
+    flex: 1;
+    overflow: auto;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    user-select: none;
+  }
+
+  .grid {
+    display: grid;
+    gap: 1px;
+    background-color: #ccc;
+    border: 1px solid #ccc;
+  }
+
+  .grid-cell {
+    width: 40px;
+    height: 40px;
+    aspect-ratio: 1/1;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    transition: transform 0.1s ease-in-out;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .grid-cell:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+  }
+
+  .grid-cell img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    image-rendering: pixelated;
+    padding: 0;
+    margin: 0;
+  }
+
+  .export-area {
+    margin-top: 1rem;
+  }
+
+  #export-code {
+    width: 100%;
+    height: 100px;
+    font-family: monospace;
+    padding: 0.5rem;
+    resize: vertical;
+  }
+
+  .validation-message {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  .validation-message.error {
+    color: #e53e3e;
+  }
+
+  .validation-message.success {
+    color: #38a169;
+  }
+  
+  .help-section {
+    margin-top: 1rem;
+    border-top: 1px solid #ddd;
+    padding-top: 1rem;
+  }
+  
+  .shortcuts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .tip {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: #4a5568;
+  }
+
+  @media (max-width: 768px) {
+    .maker-container {
+      flex-direction: column;
+      height: auto;
+      max-height: none; 
+    }
+
+    .side-panel {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  // Define types
+  type CellType = "floor" | "wall" | "target" | "box" | "player" | "box_on_target";
+
+  interface Cell {
+    type: CellType;
+    element: HTMLElement;
+  }
+
+  // Main class for the level maker
+  class LevelMaker {
+    private grid: Cell[][] = [];
+    private gridElement: HTMLElement;
+    private selectedBlockType: CellType = "floor";
+    private gridWidth = 10;
+    private gridHeight = 10;
+    private playerPosition: { x: number; y: number } | null = null;
+    private exportCodeElement: HTMLTextAreaElement;
+    private validationMessageElement: HTMLElement;
+    private isPainting = true;
+
+    constructor() {
+      // Initialize DOM elements
+      this.gridElement = document.getElementById("level-grid") as HTMLElement;
+      this.exportCodeElement = document.getElementById("export-code") as HTMLTextAreaElement;
+      this.validationMessageElement = document.getElementById("validation-message") as HTMLElement;
+
+      // Set up event listeners
+      this.setupEventListeners();
+
+      // Initialize the grid
+      this.createGrid();
+      
+      // Add document-level events for painting
+      document.addEventListener("mouseup", () => this.stopPainting());
+      document.addEventListener("mouseleave", () => this.stopPainting());
+      
+      // Add event listener to the grid container for better drag handling
+      this.gridElement.addEventListener("mousemove", (e) => {
+        if (this.isPainting) {
+          // Find the cell under the current mouse position
+          const cell = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement;
+          if (cell && cell.classList.contains("grid-cell")) {
+            const x = parseInt(cell.dataset.x || "-1");
+            const y = parseInt(cell.dataset.y || "-1");
+            if (x >= 0 && y >= 0 && (this.selectedBlockType !== "player" || !this.playerPosition)) {
+              this.handleCellClick(x, y);
+            }
+          }
+        }
+      });
+    }
+    
+    private startPainting(): void {
+      this.isPainting = true;
+    }
+    
+    private stopPainting(): void {
+      this.isPainting = false;
+    }
+    
+    // Track current painting coordinates to prevent duplicates
+    private lastPaintedX: number = -1;
+    private lastPaintedY: number = -1;
+    
+    private selectBlockType(type: CellType): void {
+      this.selectedBlockType = type;
+      
+      // Update UI to reflect the selection
+      document.querySelectorAll(".block-button").forEach(button => {
+        button.classList.remove("selected");
+        if (button.getAttribute("data-block-type") === type) {
+          button.classList.add("selected");
+        }
+      });
+    }
+
+    private setupEventListeners(): void {
+      // Block type selection
+      const blockButtons = document.querySelectorAll(".block-button");
+      blockButtons.forEach(button => {
+        button.addEventListener("click", () => {
+          blockButtons.forEach(b => b.classList.remove("selected"));
+          button.classList.add("selected");
+          this.selectedBlockType = button.getAttribute("data-block-type") as CellType;
+        });
+      });
+      
+      // Keyboard shortcuts
+      document.addEventListener("keydown", (e) => {
+        switch (e.key) {
+          case "f": // Floor
+            this.selectBlockType("floor");
+            break;
+          case "w": // Wall
+            this.selectBlockType("wall");
+            break;
+          case "t": // Target
+            this.selectBlockType("target");
+            break;
+          case "b": // Box
+            this.selectBlockType("box");
+            break;
+          case "p": // Player
+            this.selectBlockType("player");
+            break;
+          case "g": // Box on target
+            this.selectBlockType("box_on_target");
+            break;
+          case "Escape": // Cancel painting
+            this.stopPainting();
+            break;
+        }
+      });
+
+      // Grid controls
+      document.getElementById("resize-grid")?.addEventListener("click", () => {
+        const widthInput = document.getElementById("grid-width") as HTMLInputElement;
+        const heightInput = document.getElementById("grid-height") as HTMLInputElement;
+        const newWidth = parseInt(widthInput.value);
+        const newHeight = parseInt(heightInput.value);
+
+        if (newWidth >= 5 && newWidth <= 20 && newHeight >= 5 && newHeight <= 20) {
+          this.gridWidth = newWidth;
+          this.gridHeight = newHeight;
+          this.createGrid();
+        }
+      });
+
+      // Action buttons
+      document.getElementById("clear-grid")?.addEventListener("click", () => {
+        this.clearGrid();
+      });
+
+      document.getElementById("fill-walls")?.addEventListener("click", () => {
+        this.fillBorderWithWalls();
+      });
+
+      document.getElementById("export-level")?.addEventListener("click", () => {
+        this.exportLevel();
+      });
+    }
+
+    private createGrid(): void {
+      // Clear existing grid
+      this.gridElement.innerHTML = "";
+      this.grid = [];
+      this.playerPosition = null;
+
+      // Set grid columns
+      this.gridElement.style.gridTemplateColumns = `repeat(${this.gridWidth}, 40px)`;
+      this.gridElement.style.gridTemplateRows = `repeat(${this.gridHeight}, 40px)`;
+
+      // Create cells
+      for (let y = 0; y < this.gridHeight; y++) {
+        this.grid[y] = [];
+        for (let x = 0; x < this.gridWidth; x++) {
+          const cell = document.createElement("div");
+          cell.className = "grid-cell";
+          cell.dataset.x = x.toString();
+          cell.dataset.y = y.toString();
+
+          // Set default cell type
+          this.grid[y][x] = {
+            type: "floor",
+            element: cell
+          };
+
+          // Add image
+          const img = document.createElement("img");
+          img.src = "/assets/sokoban/ground.png";
+          img.alt = "floor";
+          img.style.display = "block";
+          img.style.width = "100%";
+          img.style.height = "100%";
+          cell.appendChild(img);
+
+          // Add event listeners for click and drag painting
+          cell.addEventListener("mousedown", (e) => {
+            e.preventDefault();
+            this.handleCellClick(x, y);
+            this.startPainting();
+          });
+          
+          // We'll use the grid-level mousemove event instead of individual cell events
+          // This prevents issues with fast mouse movement skipping cells
+
+          this.gridElement.appendChild(cell);
+        }
+      }
+    }
+
+    private handleCellClick(x: number, y: number): void {
+      // Skip if trying to paint same cell twice in a row during painting
+      if (this.isPainting && x === this.lastPaintedX && y === this.lastPaintedY) {
+        return;
+      }
+      
+      // Update tracking variables
+      this.lastPaintedX = x;
+      this.lastPaintedY = y;
+      
+      // Make sure x and y are within grid bounds
+      if (y < 0 || y >= this.gridHeight || x < 0 || x >= this.gridWidth) {
+        return;
+      }
+      
+      const cell = this.grid[y][x];
+
+      // Handle player placement (can only be placed once)
+      if (this.selectedBlockType === "player") {
+        if (this.playerPosition) {
+          // Remove previous player
+          const prevCell = this.grid[this.playerPosition.y][this.playerPosition.x];
+          prevCell.type = "floor";
+          this.setCellToType(prevCell.element, "floor");
+        }
+        this.playerPosition = { x, y };
+      }
+
+      // Update cell type
+      cell.type = this.selectedBlockType;
+      
+      // Update cell appearance
+      this.setCellToType(cell.element, this.selectedBlockType);
+    }
+
+    private setCellToType(cellElement: HTMLElement, type: CellType): void {
+      // Remove any existing content
+      while (cellElement.firstChild) {
+        cellElement.removeChild(cellElement.firstChild);
+      }
+
+      // Create new image element with proper dimensions and display
+      const img = document.createElement("img");
+      img.style.display = "block";
+      img.style.width = "100%";
+      img.style.height = "100%";
+      img.style.imageRendering = "pixelated";
+
+      switch (type) {
+        case "floor":
+          img.src = "/assets/sokoban/ground.png";
+          img.alt = "Floor";
+          cellElement.appendChild(img);
+          break;
+        case "wall":
+          img.src = "/assets/sokoban/wall.png";
+          img.alt = "Wall";
+          cellElement.appendChild(img);
+          break;
+        case "target":
+          img.src = "/assets/sokoban/target.png";
+          img.alt = "Target";
+          cellElement.appendChild(img);
+          break;
+        case "box":
+          img.src = "/assets/sokoban/box.png";
+          img.alt = "Box";
+          cellElement.appendChild(img);
+          break;
+        case "player":
+          img.src = "/assets/sokoban/cat.png";
+          img.alt = "Player";
+          cellElement.appendChild(img);
+          break;
+        case "box_on_target":
+          // For box on target, we need to overlay two images
+          const container = document.createElement("div");
+          container.style.position = "relative";
+          container.style.width = "100%";
+          container.style.height = "100%";
+
+          const targetImg = document.createElement("img");
+          targetImg.src = "/assets/sokoban/target.png";
+          targetImg.alt = "Target";
+          targetImg.style.position = "absolute";
+          targetImg.style.top = "0";
+          targetImg.style.left = "0";
+          targetImg.style.width = "100%";
+          targetImg.style.height = "100%";
+          targetImg.style.imageRendering = "pixelated";
+          
+          const boxImg = document.createElement("img");
+          boxImg.src = "/assets/sokoban/box.png";
+          boxImg.alt = "Box";
+          boxImg.style.position = "absolute";
+          boxImg.style.top = "0";
+          boxImg.style.left = "0";
+          boxImg.style.width = "100%";
+          boxImg.style.height = "100%";
+          boxImg.style.zIndex = "1";
+          boxImg.style.imageRendering = "pixelated";
+          
+          // Add green mask overlay
+          const greenMask = document.createElement("div");
+          greenMask.style.position = "absolute";
+          greenMask.style.top = "0";
+          greenMask.style.left = "0";
+          greenMask.style.width = "100%";
+          greenMask.style.height = "100%";
+          greenMask.style.backgroundColor = "rgba(0, 255, 0, 0.5)";
+          greenMask.style.zIndex = "2";
+
+          container.appendChild(targetImg);
+          container.appendChild(boxImg);
+          container.appendChild(greenMask);
+          cellElement.appendChild(container);
+          break;
+      }
+    }
+
+    private clearGrid(): void {
+      for (let y = 0; y < this.gridHeight; y++) {
+        for (let x = 0; x < this.gridWidth; x++) {
+          const cell = this.grid[y][x];
+          cell.type = "floor";
+          this.setCellToType(cell.element, "floor");
+        }
+      }
+      this.playerPosition = null;
+    }
+
+    private fillBorderWithWalls(): void {
+      for (let y = 0; y < this.gridHeight; y++) {
+        for (let x = 0; x < this.gridWidth; x++) {
+          // Check if cell is on the border
+          if (x === 0 || y === 0 || x === this.gridWidth - 1 || y === this.gridHeight - 1) {
+            const cell = this.grid[y][x];
+            cell.type = "wall";
+            this.setCellToType(cell.element, "wall");
+          }
+        }
+      }
+    }
+
+    private exportLevel(): void {
+      // Validate level before exporting
+      if (!this.validateLevel()) {
+        return;
+      }
+
+      let levelMap: string[] = [];
+      
+      for (let y = 0; y < this.gridHeight; y++) {
+        let row = "";
+        for (let x = 0; x < this.gridWidth; x++) {
+          const cell = this.grid[y][x];
+          
+          switch (cell.type) {
+            case "wall":
+              row += "W";
+              break;
+            case "floor":
+              row += " ";
+              break;
+            case "target":
+              row += "T";
+              break;
+            case "box":
+              row += "B";
+              break;
+            case "player":
+              row += "P";
+              break;
+            case "box_on_target":
+              row += "G";
+              break;
+          }
+        }
+        levelMap.push(`"${row}",`);
+      }
+      
+      const levelCode = `{\n  map: [\n    ${levelMap.join("\n    ")}\n  ],\n},`;
+      this.exportCodeElement.value = levelCode;
+      
+      // Show success message
+      this.validationMessageElement.textContent = "Level exported successfully! Copy this code to your levels.ts file.";
+      this.validationMessageElement.className = "validation-message success";
+    }
+
+    private validateLevel(): boolean {
+      // Check if player exists
+      if (!this.playerPosition) {
+        this.validationMessageElement.textContent = "Error: Level must have a player!";
+        this.validationMessageElement.className = "validation-message error";
+        return false;
+      }
+
+      // Count boxes and targets
+      let boxCount = 0;
+      let targetCount = 0;
+
+      for (let y = 0; y < this.gridHeight; y++) {
+        for (let x = 0; x < this.gridWidth; x++) {
+          const cell = this.grid[y][x];
+          if (cell.type === "box" || cell.type === "box_on_target") {
+            boxCount++;
+          }
+          if (cell.type === "target" || cell.type === "box_on_target") {
+            targetCount++;
+          }
+        }
+      }
+
+      // Check if boxes match targets
+      if (boxCount === 0 || targetCount === 0) {
+        this.validationMessageElement.textContent = "Error: Level must have at least one box and one target!";
+        this.validationMessageElement.className = "validation-message error";
+        return false;
+      }
+
+      if (boxCount !== targetCount) {
+        this.validationMessageElement.textContent = `Warning: Number of boxes (${boxCount}) doesn't match number of targets (${targetCount})!`;
+        this.validationMessageElement.className = "validation-message error";
+        return false;
+      }
+
+      return true;
+    }
+  }
+
+  // Initialize the level maker when the DOM is fully loaded
+  document.addEventListener("DOMContentLoaded", () => {
+    new LevelMaker();
+  });
+</script>

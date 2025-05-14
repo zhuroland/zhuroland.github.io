@@ -3,9 +3,33 @@ layout: '../../../layouts/DocsLayout.astro'
 title: Games
 author: Roland ZHU
 ---
+import { CardGrid } from '@astrojs/starlight/components';
+import Card from "../../../components/my-card.astro";
 
 This is a list of games I've made or worked on.
 
-- [Sokoban](/sokoban)
+<CardGrid>
+  <Card title="Sokoban" href="/sokoban" icon="puzzle">
+    <img src="/assets/sokoban/sokoban-game.png" width="150" alt="sokoban" title="Sokoba gamen" />
+    <p>
+      A puzzle game where the player pushes boxes around a grid to
+      reach the target positions.
+    </p>
+    <p>
+      Made with <strong>HTML</strong>, <strong>CSS</strong>, and <strong>JavaScript</strong>
+    </p>
+  </Card>
+  
+  <Card title="Sokoban Level Maker" href="/sokoban/maker" icon="pencil">
+    <img src="/assets/sokoban/sokoban-maker.png" width="200" alt="sokoban" title="Sokoban maker" />
+    <p>
+      Create your own Sokoban levels with this interactive level maker.
+      Design custom puzzles by placing walls, boxes, targets, and more.
+    </p>
+    <p>
+      Export your level code to add to the game.
+    </p>
+  </Card>
+</CardGrid>
 
 If you have any questions, feel free to [contact me](/contact).
