@@ -1,0 +1,480 @@
+---
+import Button from "../../components/button.astro";
+---
+
+<Button href="/">Go back</Button>
+<h1>Sokoban</h1>
+<div class="game-container">
+  <canvas data-canvas-game width="800" height="600"></canvas>
+  <div class="controls">
+    <button data-canvas-restart>Restart Level</button>
+    <button data-canvas-prev>Previous Level</button>
+    <button data-canvas-next>Next Level</button>
+  </div>
+</div>
+
+<style>
+  .game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .controls {
+    display: flex;
+    gap: 1rem;
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+    background: #4a5568;
+    color: white;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #2d3748;
+  }
+</style>
+
+<script>
+  // getting the canvas and context
+  import { canvas, ctx } from "../../utils/canvas";
+  // getting the levels
+  import { levels } from "./levels";
+  // ========================
+  // Type definitions
+  // ========================
+  interface Position {
+    x: number;
+    y: number;
+  }
+
+  type CellType = "wall" | "floor" | "target";
+
+  // ========================
+  // Game configuration
+  // ========================
+  const TILE_SIZE = 50;
+
+  // ========================
+  // Game state
+  // ========================
+  let playerPos: Position = { x: 0, y: 0 };
+  let gameMap: CellType[][] = [];
+  let boxes: Position[] = [];
+  let targets: Position[] = [];
+  let currentLevel = 0;
+  let moves = 0;
+  let gameComplete = false;
+  let isGameReady = false;
+
+  // ========================
+  // Game assets
+  // ========================
+  const images = {
+    player: new Image(),
+    wall: new Image(),
+    box: new Image(),
+    target: new Image(),
+  };
+
+  // ========================
+  // Game initialization
+  // ========================
+  function init(): void {
+    // Load all images
+    loadImages();
+
+    // Set up controls
+    setupControls();
+  }
+
+  // ========================
+  // Asset loading
+  // ========================
+  function loadImages(): void {
+    let loadedImages = 0;
+    const totalImages = Object.keys(images).length;
+
+    const loadHandler = () => {
+      loadedImages++;
+      if (loadedImages === totalImages) {
+        // All images loaded, start the game
+        isGameReady = true;
+        initLevel(currentLevel);
+        // Start the game loop
+        requestAnimationFrame(gameLoop);
+      }
+    };
+
+    // Set up image sources and load handlers
+    images.player.onload = loadHandler;
+    images.wall.onload = loadHandler;
+    images.box.onload = loadHandler;
+    images.target.onload = loadHandler;
+
+    images.player.src = "./assets/sokoban/cat.png";
+    images.wall.src = "./assets/sokoban/wall.png";
+    images.box.src = "./assets/sokoban/box.png";
+    images.target.src = "./assets/sokoban/target.png";
+  }
+
+  // ========================
+  // Level management
+  // ========================
+  function initLevel(levelIdx: number): void {
+    if (levelIdx >= levels.length) {
+      levelIdx = 0; // Wrap around to first level
+    }
+
+    currentLevel = levelIdx;
+    moves = 0;
+    gameComplete = false;
+
+    // Reset game state
+    playerPos = { x: 0, y: 0 };
+    gameMap = [];
+    boxes = [];
+    targets = [];
+
+    // Parse the level
+    parseLevel(levels[levelIdx].map);
+
+    // Adjust canvas size to fit the level
+    const maxWidth =
+      Math.max(...levels[levelIdx].map.map((row) => row.length)) * TILE_SIZE;
+    const maxHeight = levels[levelIdx].map.length * TILE_SIZE;
+
+    canvas.width = Math.max(maxWidth, 400);
+    canvas.height = Math.max(maxHeight + 40, 400); // Extra space for UI text
+  }
+
+  function parseLevel(levelMap: string[]): void {
+    for (let y = 0; y < levelMap.length; y++) {
+      const row = levelMap[y];
+      gameMap[y] = [];
+
+      for (let x = 0; x < row.length; x++) {
+        const cell = row[x];
+
+        switch (cell) {
+          case "W":
+            gameMap[y][x] = "wall";
+            break;
+          case "B":
+            gameMap[y][x] = "floor";
+            boxes.push({ x, y });
+            break;
+          case "T":
+            gameMap[y][x] = "target";
+            targets.push({ x, y });
+            break;
+          case "P":
+            gameMap[y][x] = "floor";
+            playerPos = { x, y };
+            break;
+          default:
+            gameMap[y][x] = "floor";
+        }
+      }
+    }
+  }
+
+  // ========================
+  // Controls setup
+  // ========================
+  function setupControls(): void {
+    // Keyboard controls
+    document.addEventListener("keydown", handleKeydown);
+
+    // Button controls
+    const restartButton = document.querySelector("[data-canvas-restart]");
+    const nextLevelButton = document.querySelector("[data-canvas-next]");
+    const prevLevelButton = document.querySelector("[data-canvas-prev]");
+
+    if (restartButton) {
+      restartButton.addEventListener("click", () => {
+        initLevel(currentLevel);
+      });
+    }
+
+    if (nextLevelButton) {
+      nextLevelButton.addEventListener("click", () => {
+        if (currentLevel < levels.length - 1) {
+          initLevel(currentLevel + 1);
+        } else {
+          initLevel(0);
+        }
+      });
+    }
+
+    if (prevLevelButton) {
+      prevLevelButton.addEventListener("click", () => {
+        if (currentLevel > 0) {
+          initLevel(currentLevel - 1);
+        } else {
+          initLevel(levels.length - 1);
+        }
+      });
+    }
+  }
+
+  function handleKeydown(event: KeyboardEvent): void {
+    if (!isGameReady || gameComplete) {
+      if (gameComplete && event.key === " ") {
+        // Next level on space when level is complete
+        nextLevel();
+        return;
+      }
+
+      if (gameComplete && (event.key === "r" || event.key === "R")) {
+        // Restart game on R when all levels are complete
+        initLevel(0);
+        return;
+      }
+
+      return;
+    }
+
+    let dx = 0;
+    let dy = 0;
+
+    switch (event.key) {
+      case "ArrowUp":
+        dy = -1;
+        break;
+      case "ArrowDown":
+        dy = 1;
+        break;
+      case "ArrowLeft":
+        dx = -1;
+        break;
+      case "ArrowRight":
+        dx = 1;
+        break;
+      case "r":
+      case "R":
+        // Restart current level
+        initLevel(currentLevel);
+        return;
+      case "Escape":
+        // Restart current level
+        initLevel(currentLevel);
+        return;
+      default:
+        return;
+    }
+
+    if (dx !== 0 || dy !== 0) {
+      movePlayer(dx, dy);
+      event.preventDefault();
+    }
+  }
+
+  function nextLevel(): void {
+    if (currentLevel < levels.length - 1) {
+      initLevel(currentLevel + 1);
+    } else {
+      // Game complete - restart from beginning
+      gameComplete = true;
+      // Keep the victory screen until player presses R
+    }
+  }
+
+  // ========================
+  // Game mechanics
+  // ========================
+  function movePlayer(dx: number, dy: number): void {
+    const newX = playerPos.x + dx;
+    const newY = playerPos.y + dy;
+
+    // Check if new position is valid
+    if (isWall(newX, newY)) {
+      return; // Can't move through walls
+    }
+
+    // Check if there's a box to push
+    const boxIndex = getBoxAt(newX, newY);
+    if (boxIndex !== -1) {
+      const newBoxX = newX + dx;
+      const newBoxY = newY + dy;
+
+      // Can the box be pushed?
+      if (isWall(newBoxX, newBoxY) || getBoxAt(newBoxX, newBoxY) !== -1) {
+        return; // Can't push box into wall or another box
+      }
+
+      // Move the box
+      boxes[boxIndex].x = newBoxX;
+      boxes[boxIndex].y = newBoxY;
+    }
+
+    // Move the player
+    playerPos.x = newX;
+    playerPos.y = newY;
+    moves++;
+  }
+
+  function isWall(x: number, y: number): boolean {
+    if (y < 0 || y >= gameMap.length || x < 0 || x >= gameMap[y].length) {
+      return true; // Out of bounds is treated as a wall
+    }
+    return gameMap[y][x] === "wall";
+  }
+
+  function getBoxAt(x: number, y: number): number {
+    return boxes.findIndex((box) => box.x === x && box.y === y);
+  }
+
+  function isTarget(x: number, y: number): boolean {
+    return targets.some((target) => target.x === x && target.y === y);
+  }
+
+  function checkWin(): boolean {
+    // Level is complete when all targets have boxes on them
+    const allBoxesOnTargets = targets.every((target) =>
+      boxes.some((box) => box.x === target.x && box.y === target.y)
+    );
+
+    if (allBoxesOnTargets && !gameComplete) {
+      gameComplete = true;
+
+      // If this was the last level, show game complete message
+      if (currentLevel === levels.length - 1) {
+        console.log("Game complete!");
+      } else {
+        console.log(`Level ${currentLevel + 1} complete!`);
+      }
+    }
+
+    return allBoxesOnTargets;
+  }
+
+  // ========================
+  // Game rendering
+  // ========================
+  function draw(): void {
+    if (!isGameReady || !ctx) return;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw background
+    ctx.fillStyle = "#f0f0f0";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw map (walls and targets)
+    for (let y = 0; y < gameMap.length; y++) {
+      for (let x = 0; x < gameMap[y].length; x++) {
+        const cell = gameMap[y][x];
+        const posX = x * TILE_SIZE;
+        const posY = y * TILE_SIZE;
+
+        if (cell === "wall") {
+          ctx.drawImage(images.wall, posX, posY, TILE_SIZE, TILE_SIZE);
+        } else if (cell === "target") {
+          ctx.drawImage(images.target, posX, posY, TILE_SIZE, TILE_SIZE);
+        }
+      }
+    }
+
+    // Draw boxes
+    boxes.forEach((box) => {
+      const posX = box.x * TILE_SIZE;
+      const posY = box.y * TILE_SIZE;
+
+      // Check if box is on a target
+      const onTarget = isTarget(box.x, box.y);
+
+      ctx.drawImage(images.box, posX, posY, TILE_SIZE, TILE_SIZE);
+
+      if (onTarget) {
+        // Visual indication that box is on target
+        ctx.fillStyle = "rgba(0, 255, 0, 0.3)";
+        ctx.fillRect(posX, posY, TILE_SIZE, TILE_SIZE);
+      }
+    });
+
+    // Draw player
+    ctx.drawImage(
+      images.player,
+      playerPos.x * TILE_SIZE,
+      playerPos.y * TILE_SIZE,
+      TILE_SIZE,
+      TILE_SIZE
+    );
+
+    // Draw UI information
+    ctx.fillStyle = "black";
+    ctx.font = "16px Arial";
+    ctx.fillText(
+      `Level: ${currentLevel + 1}/${levels.length}`,
+      10,
+      canvas.height - 10
+    );
+    ctx.fillText(`Moves: ${moves}`, canvas.width - 100, canvas.height - 10);
+
+    // Draw victory message if game is complete
+    if (gameComplete) {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "white";
+      ctx.font = "32px Arial";
+
+      if (currentLevel < levels.length - 1) {
+        ctx.fillText(
+          "Level Complete!",
+          canvas.width / 2 - 120,
+          canvas.height / 2 - 20
+        );
+        ctx.font = "20px Arial";
+        ctx.fillText(
+          "Press Space for next level",
+          canvas.width / 2 - 110,
+          canvas.height / 2 + 20
+        );
+      } else {
+        ctx.fillText(
+          "Game Complete!",
+          canvas.width / 2 - 120,
+          canvas.height / 2 - 20
+        );
+        ctx.font = "20px Arial";
+        ctx.fillText(
+          "Press R to restart game",
+          canvas.width / 2 - 100,
+          canvas.height / 2 + 20
+        );
+      }
+    }
+  }
+
+  // ========================
+  // Game loop
+  // ========================
+  function update(): void {
+    if (gameComplete) return;
+
+    // Check win condition
+    checkWin();
+  }
+
+  function gameLoop(): void {
+    // Update game state
+    update();
+
+    // Render the game
+    draw();
+
+    // Schedule next frame
+    requestAnimationFrame(gameLoop);
+  }
+
+  // Start the game when the page loads
+  window.addEventListener("load", init);
+</script>
