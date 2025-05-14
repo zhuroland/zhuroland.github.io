@@ -69,6 +69,13 @@ import Button from "../../components/button.astro";
       <div class="validation-message" id="validation-message"></div>
     </div>
 
+    <div class="import-area">
+      <h3>Import Level</h3>
+      <textarea id="import-code-area" rows="5" placeholder="Paste level JSON code here..."></textarea>
+      <button id="import-level-button">Import Level</button>
+      <div class="validation-message" id="import-validation-message"></div>
+    </div>
+
     <div class="help-section">
       <h3>Keyboard Shortcuts</h3>
       <div class="shortcuts">
@@ -294,6 +301,22 @@ import Button from "../../components/button.astro";
     color: #38a169;
   }
 
+  .import-area {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  #import-code-area {
+    width: 100%;
+    font-family: monospace;
+    padding: 0.5rem;
+    resize: vertical;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+  }
+
   .help-section {
     margin-top: 1rem;
     border-top: 1px solid #ddd;
@@ -353,7 +376,9 @@ import Button from "../../components/button.astro";
     private playerPosition: { x: number; y: number } | null = null;
     private exportCodeElement: HTMLTextAreaElement;
     private validationMessageElement: HTMLElement;
-    private isPainting = true;
+    private importCodeAreaElement: HTMLTextAreaElement;
+    private importValidationMessageElement: HTMLElement;
+    private isPainting = false;
 
     constructor() {
       // Initialize DOM elements
@@ -363,6 +388,12 @@ import Button from "../../components/button.astro";
       ) as HTMLTextAreaElement;
       this.validationMessageElement = document.getElementById(
         "validation-message"
+      ) as HTMLElement;
+      this.importCodeAreaElement = document.getElementById(
+        "import-code-area"
+      ) as HTMLTextAreaElement;
+      this.importValidationMessageElement = document.getElementById(
+        "import-validation-message"
       ) as HTMLElement;
 
       // Set up event listeners
@@ -487,6 +518,10 @@ import Button from "../../components/button.astro";
 
       document.getElementById("export-level")?.addEventListener("click", () => {
         this.exportLevel();
+      });
+
+      document.getElementById("import-level-button")?.addEventListener("click", () => {
+        this.importLevel();
       });
     }
 
@@ -738,44 +773,147 @@ import Button from "../../components/button.astro";
         return;
       }
 
-      let levelMap: string[] = [];
-
+      const levelDataMap: string[] = [];
       for (let y = 0; y < this.gridHeight; y++) {
-        let row = "";
+        let rowString = "";
         for (let x = 0; x < this.gridWidth; x++) {
           const cell = this.grid[y][x];
-
+          let char = " "; // Default to floor
           switch (cell.type) {
-            case "wall":
-              row += "W";
-              break;
-            case "floor":
-              row += " ";
-              break;
-            case "target":
-              row += "T";
-              break;
-            case "box":
-              row += "B";
-              break;
-            case "player":
-              row += "P";
-              break;
-            case "box_on_target":
-              row += "G";
-              break;
+            case "wall": char = "W"; break;
+            case "floor": char = " "; break;
+            case "target": char = "T"; break;
+            case "box": char = "B"; break;
+            case "player": char = "P"; break;
+            case "box_on_target": char = "G"; break;
           }
+          rowString += char;
         }
-        levelMap.push(`"${row}",`);
+        levelDataMap.push(rowString);
+      }
+      
+      const levelObject = { map: levelDataMap };
+      const levelCode = JSON.stringify(levelObject, null, 2); // Output valid JSON
+      this.exportCodeElement.value = levelCode;
+      
+      // Show success message
+      this.validationMessageElement.textContent = "Level exported successfully as JSON! Copy this code.";
+      this.validationMessageElement.className = "validation-message success";
+    }
+
+    private importLevel(): void {
+      const levelCodeString = this.importCodeAreaElement.value.trim();
+      this.importValidationMessageElement.textContent = ""; // Clear previous messages
+      this.importValidationMessageElement.className = "validation-message";
+
+      if (!levelCodeString) {
+        this.importValidationMessageElement.textContent = "Error: No level code provided.";
+        this.importValidationMessageElement.className = "validation-message error";
+        return;
       }
 
-      const levelCode = `{\n  map: [\n    ${levelMap.join("\n    ")}\n  ],\n},`;
-      this.exportCodeElement.value = levelCode;
+      try {
+        const parsedLevel = JSON.parse(levelCodeString);
 
-      // Show success message
-      this.validationMessageElement.textContent =
-        "Level exported successfully! Copy this code to your levels.ts file.";
-      this.validationMessageElement.className = "validation-message success";
+        if (!parsedLevel || !parsedLevel.map || !Array.isArray(parsedLevel.map)) {
+          this.importValidationMessageElement.textContent = "Error: Invalid level structure. Missing 'map' array.";
+          this.importValidationMessageElement.className = "validation-message error";
+          return;
+        }
+
+        const newMap = parsedLevel.map as string[];
+        if (newMap.length === 0 || newMap.some(row => typeof row !== 'string')) {
+            this.importValidationMessageElement.textContent = "Error: Invalid map data. Must be an array of strings.";
+            this.importValidationMessageElement.className = "validation-message error";
+            return;
+        }
+
+        const newHeight = newMap.length;
+        const newWidth = newMap[0] ? newMap[0].length : 0;
+
+        if (newHeight < 5 || newHeight > 20 || newWidth < 5 || newWidth > 20) {
+          this.importValidationMessageElement.textContent = `Error: Invalid grid dimensions. Width/Height must be between 5 and 20. Detected: ${newWidth}x${newHeight}`;
+          this.importValidationMessageElement.className = "validation-message error";
+          return;
+        }
+
+        // Update grid dimensions and recreate
+        this.gridWidth = newWidth;
+        this.gridHeight = newHeight;
+        (document.getElementById("grid-width") as HTMLInputElement).value = newWidth.toString();
+        (document.getElementById("grid-height") as HTMLInputElement).value = newHeight.toString();
+        
+        this.createGrid(); // Reinitializes grid and clears playerPosition
+
+        let tempPlayerPosition: { x: number; y: number } | null = null;
+        let boxCount = 0;
+        let targetCount = 0;
+
+        for (let y = 0; y < this.gridHeight; y++) {
+          if (!newMap[y] || newMap[y].length !== this.gridWidth) {
+            this.importValidationMessageElement.textContent = `Error: Inconsistent row length or missing row at row ${y + 1}. Expected ${this.gridWidth}, got ${newMap[y]?.length || 0}.`;
+            this.importValidationMessageElement.className = "validation-message error";
+            this.clearGrid(); 
+            return;
+          }
+          for (let x = 0; x < this.gridWidth; x++) {
+            const char = newMap[y][x];
+            let cellTypeToSet: CellType = "floor"; 
+
+            switch (char) {
+              case "W": cellTypeToSet = "wall"; break;
+              case " ": cellTypeToSet = "floor"; break;
+              case "T": cellTypeToSet = "target"; targetCount++; break;
+              case "B": cellTypeToSet = "box"; boxCount++; break;
+              case "P":
+                cellTypeToSet = "player";
+                if (tempPlayerPosition) {
+                    this.importValidationMessageElement.textContent = "Error: Multiple players defined in level code.";
+                    this.importValidationMessageElement.className = "validation-message error";
+                    this.clearGrid(); return;
+                }
+                tempPlayerPosition = { x, y };
+                break;
+              case "G": cellTypeToSet = "box_on_target"; boxCount++; targetCount++; break;
+              default:
+                this.importValidationMessageElement.textContent = `Error: Unknown character '${char}' in level code at row ${y+1}, col ${x+1}.`;
+                this.importValidationMessageElement.className = "validation-message error";
+                this.clearGrid(); return;
+            }
+            this.grid[y][x].type = cellTypeToSet;
+            this.setCellToType(this.grid[y][x].element, cellTypeToSet);
+          }
+        }
+        
+        this.playerPosition = tempPlayerPosition; // Set player position after successful parsing of all cells
+
+        if (!this.playerPosition) { // Check if player was actually found and set
+            this.importValidationMessageElement.textContent = "Error: Imported level must have a player.";
+            this.importValidationMessageElement.className = "validation-message error";
+            this.clearGrid(); return;
+        }
+
+        if ((boxCount > 0 || targetCount > 0) && (boxCount === 0 || targetCount === 0)) {
+             this.importValidationMessageElement.textContent = "Error: Imported level must have at least one box AND one target if either is present and non-zero.";
+             this.importValidationMessageElement.className = "validation-message error";
+             this.clearGrid(); return;
+        }
+        if (boxCount !== targetCount) {
+            this.importValidationMessageElement.textContent = `Error: Imported level has ${boxCount} boxes and ${targetCount} targets. They must match.`;
+            this.importValidationMessageElement.className = "validation-message error";
+            this.clearGrid(); return;
+        }
+
+        this.importValidationMessageElement.textContent = "Level imported successfully!";
+        this.importValidationMessageElement.className = "validation-message success";
+        this.validationMessageElement.textContent = ""; // Clear export validation message
+
+      } catch (error) {
+        this.importValidationMessageElement.textContent = "Error: Could not parse level code. Ensure it's valid JSON.";
+        this.importValidationMessageElement.className = "validation-message error";
+        console.error("Error importing level:", error);
+        this.clearGrid(); // Attempt to clear to a known state on parsing error
+      }
     }
 
     private validateLevel(): boolean {
