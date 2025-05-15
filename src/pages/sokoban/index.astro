@@ -53,7 +53,7 @@ import Button from "../../components/button.astro";
 
 <script>
   // getting the canvas and context
-  import { canvas, ctx } from "../../utils/canvas";
+  import { getCanvasContext } from "../../utils/canvas";
   // getting the levels
   import { levels } from "./levels";
   // ========================
@@ -69,6 +69,7 @@ import Button from "../../components/button.astro";
   // ========================
   // Game configuration
   // ========================
+  const { canvas, ctx } = getCanvasContext();
   const TILE_SIZE = 50;
 
   // ========================
