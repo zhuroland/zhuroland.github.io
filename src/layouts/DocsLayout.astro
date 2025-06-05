@@ -1,5 +1,6 @@
 ---
 import conf from '../../config.json';
+import Layout from './Layout.astro'
 
 type Frontmatter = {
 	author: string;
@@ -16,7 +17,10 @@ const { frontmatter } = Astro.props;
 
 {frontmatter.author && <small>By {frontmatter.author}</small>}
 {frontmatter.description && <p>{frontmatter.description}</p>}
-<slot />
+
+<Layout>
+	<slot />
+</Layout>
 
 <script is:inline define:vars={{ birthdate }}>
 	const calculateAge = () => {
