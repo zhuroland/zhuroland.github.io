@@ -7,7 +7,7 @@ export default defineConfig({
   site: "https://zhuroland.github.io",
   integrations: [
     starlight({
-      title: `${conf.infos.author} Protfolio`,
+      title: `${conf.infos.author} Portfolio`,
       social: conf.infos.socials,
       sidebar: [
         {
