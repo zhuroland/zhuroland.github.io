@@ -1,6 +1,7 @@
 import { defineConfig } from "astro/config";
 import starlight from "@astrojs/starlight";
 import conf from "./config.json";
+import starlightLlmsTxt from "starlight-llms-txt";
 
 // https://astro.build/config
 export default defineConfig({
@@ -44,6 +45,7 @@ export default defineConfig({
           autogenerate: { directory: "documentation" },
         },
       ],
+      plugins: [starlightLlmsTxt()],
     }),
   ],
 });
