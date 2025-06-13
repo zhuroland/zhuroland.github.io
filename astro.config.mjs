@@ -27,7 +27,7 @@ export default defineConfig({
               link: "/projects/group",
             },
             {
-              label: "My School Projects",
+              label: "My school projects",
               link: "/projects/school",
             },
           ],

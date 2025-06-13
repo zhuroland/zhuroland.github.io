@@ -1,14 +1,19 @@
 ---
-layout: '../../../layouts/DocsLayout.astro'
+layout: "../../../layouts/DocsLayout.astro"
 title: My group projects
 author: Roland ZHU
 ---
 
-import { CardGrid } from '@astrojs/starlight/components';
-import Card from '../../../components/my-card.astro';
+import { CardGrid } from "@astrojs/starlight/components";
+import Card from "../../../components/my-card.astro";
 
 <CardGrid>
-	<Card target title="KRYP Ticket" href="https://kryp-ticket.vercel.app">
+	<Card target title="Chatbot">
+			<p>An intelligent conversational AI powered by large language models, designed with a modular architecture for seamless integration across multiple platforms and websites.</p>
+			<p>Made with <strong>React</strong>, <strong>Bun</strong></p>
+			<small>Worked on with <strong><a href="https://www.linkedin.com/in/nguyen-khai-phan/">Khai</a></strong></small>
+		</Card>
+	  <Card target title="KRYP Ticket" href="https://kryp-ticket.vercel.app">
 			<p>A ticket system made for student, to help each other.</p>
 			<p>Made with <strong>Next.js</strong></p>
 			<small>Worked on with <strong>Khai</strong></small>
@@ -22,14 +27,15 @@ import Card from '../../../components/my-card.astro';
 		</Card>
 		<Card title="Crep'Way">
 
-			A website for a restaurant that sells crepes, waffles, and drinks.
-			It has 3 parts: the **client**, the **admin**, and the **API**.
-			
-			- The client can order food and drinks.
-			- The admin can manage the menu and the orders.
-			- The API is used by the client and the admin.
+    		A website for a restaurant that sells crepes, waffles, and drinks.
+    		It has 3 parts: the **client**, the **admin**, and the **API**.
 
-			<p>Made with **Next.js**, **Elysia**</p>
-			<small>Worked on with **group**</small>
-		</Card>
+    		- The client can order food and drinks.
+    		- The admin can manage the menu and the orders.
+    		- The API is used by the client and the admin.
+
+    		<p>Made with **Next.js**, **Elysia**</p>
+    		<small>Worked on with **group**</small>
+    	</Card>
+
 </CardGrid>
