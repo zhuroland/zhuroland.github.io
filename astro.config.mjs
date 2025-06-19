@@ -45,8 +45,21 @@ export default defineConfig({
           autogenerate: { directory: "documentation" },
         },
         {
-          label: "Llms.txt",
-          link: "/llms.txt",
+          label: "Llms",
+          items: [
+            {
+              label: "llms.txt",
+              link: "/llms.txt"
+            },
+            {
+              label: "llms-small.txt",
+              link: "/llms-small.txt"
+            },
+            {
+              label: "llms-full.txt",
+              link: "/llms-full.txt"
+            }
+          ]
         }
       ],
       plugins: [starlightLlmsTxt()],
