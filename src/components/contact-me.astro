@@ -4,7 +4,7 @@ import Textarea from './textarea.astro';
 import Button from './button.astro';
 ---
 
-<form id="contact_me" onsubmit="return sendContactMe(this)">
+<form data-contact-me>
 	<div>
 		<Input label="Firstname*" type="text" name="firstname" />
 		<Input label="Lastname*" type="text" name="lastname" />
@@ -13,30 +13,23 @@ import Button from './button.astro';
 	<Input label="Phone" type="tel" name="phone" />
 	<Textarea label="Message*" name="text" rows={1} />
 	<Button type="submit">Send</Button>
-	<small id="contact_me_response"></small>
+	<small data-contact-me-response></small>
 </form>
 
 <script is:inline defer>
-	function sendContactMe(e) {
-		const contactMeForm = document.getElementById('contact_me');
-		const contactMeResponse = document.getElementById('contact_me_response');
+	const contactMeForm = document.querySelector('[data-contact-me]');
+	const contactMeResponse = document.querySelector('[data-contact-me-response]');
 
-		const formData = new FormData(e);
+	function sendContactMe(e) {
+		const formData = new FormData(e.target);
 		const firstname = formData.get('firstname');
 		const lastname = formData.get('lastname');
 		const email = formData.get('email');
 		const body = formData.get('text');
 		const phone = formData.get('phone');
 
-		if (!firstname || !lastname || !email || !body) {
-			contactMeResponse.classList.add('block');
-			contactMeResponse.innerHTML = 'Please fill all the fields';
-			contactMeResponse.scrollIntoView();
+		if (!firstname || !lastname || !email || !body)
 			return false;
-		}
-
-		contactMeForm.classList.add('block');
-		contactMeForm.innerHTML = 'Message sent!';
 
 		fetch('https://ntfy.sh/zhuroland-XE63crsJWD', {
 			method: 'POST',
@@ -48,8 +41,22 @@ import Button from './button.astro';
 			},
 		});
 
-		return false;
+		return true;
 	}
+
+	contactMeForm.addEventListener("submit", (e) => {
+		e.preventDefault()
+
+		if (!sendContactMe(e)) {
+			contactMeResponse.classList.add('block');
+			contactMeResponse.innerHTML = 'Please fill all the fields';
+			contactMeResponse.scrollIntoView();
+			return
+		}
+
+		contactMeForm.classList.add('block');
+		contactMeForm.innerHTML = 'Message sent!';
+	});
 </script>
 
 <style>
