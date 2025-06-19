@@ -1,5 +1,4 @@
 ---
-import conf from '../../config.json';
 import Layout from './Layout.astro'
 
 type Frontmatter = {
@@ -11,7 +10,6 @@ type Props = {
 	frontmatter: Frontmatter;
 };
 
-const birthdate = conf.infos.birthdate;
 const { frontmatter } = Astro.props;
 ---
 
@@ -21,17 +19,6 @@ const { frontmatter } = Astro.props;
 <Layout>
 	<slot />
 </Layout>
-
-<script is:inline define:vars={{ birthdate }}>
-	const calculateAge = () => {
-		const timeDiff = Math.abs(Date.now() - new Date(birthdate).getTime());
-
-		return Math.floor(timeDiff / (1000 * 3600 * 24) / 365.25).toString();
-	};
-
-	const myagespan = document.querySelector('[data-my-age]');
-	if (myagespan) myagespan.textContent = calculateAge();
-</script>
 
 <style is:global>
 	:root {
