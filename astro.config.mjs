@@ -62,7 +62,9 @@ export default defineConfig({
           ]
         }
       ],
-      plugins: [starlightLlmsTxt()],
+      plugins: [starlightLlmsTxt({
+        exclude: ["documentation/*"]
+      })],
     }),
   ],
 });
