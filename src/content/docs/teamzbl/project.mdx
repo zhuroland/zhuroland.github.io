@@ -1,0 +1,24 @@
+---
+layout: "../../../layouts/DocsLayout.astro"
+title: Projects
+author: TeamZBL
+---
+
+import { CardGrid } from "@astrojs/starlight/components";
+import Card from "../../../components/card.astro";
+import Contributor from "../../../components/contributor.astro";
+import TechStack from "../../../components/tech-stack.astro";
+
+<CardGrid>
+  <Card target title="Chatbot">
+    <p>An intelligent conversational AI powered by large language models, designed with a modular architecture for seamless integration across multiple platforms and websites.</p>
+    <TechStack stacks={["React", "Bun"]} />
+    <Contributor pre="Worked on with " name="khai" target="linkedin" />
+  </Card>
+	<Card target title="ColorGuessr" href="https://colorguessr.teamzbl.com">
+    <p>A fun and interactive game that challenges players to guess colors based on various clues.</p>
+    <TechStack stacks={["React", "Vite"]} />
+    <Contributor pre="Made by " name="khai" target="linkedin" />
+  </Card>
+
+</CardGrid>

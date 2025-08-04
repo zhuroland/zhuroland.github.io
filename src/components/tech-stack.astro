@@ -1,0 +1,27 @@
+---
+type TechStack =
+  | "Next.js"
+  | "React"
+  | "Bun"
+  | "Hono"
+  | "Elysia"
+  | "Typescript"
+  | "Expo"
+  | "HTML"
+  | "CSS"
+  | "JavaScript"
+  | "Tailwind CSS"
+  | "Astro"
+  | "Rust"
+  | "Python"
+  | "Go Lang"
+  | "Tauri";
+
+interface Props {
+  stacks: TechStack[];
+}
+
+const { stacks } = Astro.props;
+---
+
+<p>Made with <strong>{stacks.join(", ")}</strong></p>

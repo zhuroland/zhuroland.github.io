@@ -1,0 +1,38 @@
+---
+import conf from "../../config.json";
+
+interface Props {
+  pre?: string;
+  name: keyof typeof conf.contributors;
+  target?: "linkedin" | "github";
+}
+
+const { pre, name, target } = Astro.props;
+
+// make the first letter of the name uppercase
+const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+---
+
+<small
+  >{pre}
+  {
+    target ? (
+      <a href={conf.contributors[name][target]}>{displayName}</a>
+    ) : (
+      <span>{displayName}</span>
+    )
+  }
+</small>
+
+<style>
+  a {
+    text-decoration: none;
+    font-weight: bold;
+  }
+  a:hover {
+    text-decoration: underline;
+  }
+  span {
+    font-weight: bold;
+  }
+</style>

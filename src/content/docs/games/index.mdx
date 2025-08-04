@@ -4,7 +4,8 @@ title: Games
 author: Roland ZHU
 ---
 import { CardGrid } from '@astrojs/starlight/components';
-import Card from "../../../components/my-card.astro";
+import Card from "../../../components/card.astro";
+import TechStack from '../../../components/tech-stack.astro';
 
 This is a list of games I've made or worked on.
 
@@ -15,9 +16,7 @@ This is a list of games I've made or worked on.
       A puzzle game where the player pushes boxes around a grid to
       reach the target positions.
     </p>
-    <p>
-      Made with <strong>HTML</strong>, <strong>CSS</strong>, and <strong>JavaScript</strong>
-    </p>
+    <TechStack stacks={["HTML", "CSS", "JavaScript"]} />
   </Card>
   
   <Card title="Sokoban Level Maker" href="/sokoban/maker" icon="pencil">
@@ -29,6 +28,7 @@ This is a list of games I've made or worked on.
     <p>
       Export your level code to add to the game. (If you made a particularly good level, please share it with me by using the <strong>contact form</strong>!)
     </p>
+    <TechStack stacks={["HTML", "CSS", "JavaScript"]} />
   </Card>
 </CardGrid>
 

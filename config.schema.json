@@ -1,0 +1,79 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Web page conf",
+  "description": "This is a config file for my web page",
+  "type": "object",
+  "properties": {
+    "infos": {
+      "description": "all the infos",
+      "type": "object",
+      "properties": {
+        "author": {
+          "description": "The web page author (and title)",
+          "type": "string",
+          "minLength": 1
+        },
+        "birthdate": {
+          "description": "The author birthdate YYYY-MM-DD (for dynamic age)",
+          "type": "string",
+          "default": "YYYY-MM-DD"
+        },
+        "socials": {
+          "description": "Author's social media",
+          "type": "object",
+          "properties": {
+            "github": {
+              "description": "Author's Github name",
+              "type": "string",
+              "minLength": 1
+            },
+            "youtube": {
+              "description": "Author's Youtube name",
+              "type": "string",
+              "minLength": 1
+            },
+            "linkedin": {
+              "description": "Author's LinkedIn name",
+              "type": "string",
+              "minLength": 1
+            },
+            "twitch": {
+              "description": "Author's Twitch name",
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      },
+      "required": [
+        "author",
+        "birthdate"
+      ]
+    },
+    "contributors": {
+      "description": "Contributors to the web page",
+      "type": "object",
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
+          "description": "Contributor's info",
+          "type": "object",
+          "properties": {
+            "linkedin": {
+              "description": "Contributor's LinkedIn profile",
+              "type": "string",
+              "minLength": 1
+            },
+            "github": {
+              "description": "Contributor's Github profile",
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "infos"
+  ]
+}

@@ -1,9 +1,9 @@
 ---
 import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
 import { CardGrid } from '@astrojs/starlight/components';
-import Card from '../components/my-card.astro';
+import Card from '../components/card.astro';
 import Footer from '../components/footer.astro';
-import cont from '../../config.json';
+import conf from '../../config.json';
 import Image from '../assets/houston.webp';
 import Layout from '../layouts/Layout.astro';
 ---
@@ -12,10 +12,10 @@ import Layout from '../layouts/Layout.astro';
 <StarlightPage
 	frontmatter={{
 		title: 'Welcome to My portfolio',
-		description: `This is a portfolio website created by ${cont.infos.author}.`,
+		description: `This is a portfolio website created by ${conf.infos.author}.`,
 		template: 'splash',
 		hero: {
-			tagline: `Hello, I'm ${cont.infos.author}, a Full Stack Developer.`,
+			tagline: `Hello, I'm ${conf.infos.author}, a Full Stack Developer.`,
 			image: {
 				file: Image,
 			},
@@ -31,17 +31,17 @@ import Layout from '../layouts/Layout.astro';
 	}}
 >
 	<CardGrid stagger>
-		<Card title="Documentation" icon="document" href="/documentation/astro">
-			Here you can find all the documentation that I have written or collected.
-		</Card>
-		<Card title="My projects" icon="seti:html" href="/projects/personal">
+    <Card title="About me" icon="open-book" href="/about">
+      A summary of my background and skills.
+    </Card>
+    <Card title="My projects" icon="seti:html" href="/projects/personal">
 			Discover all the projects I have worked on.
+		</Card>
+    <Card title="Games" icon="puzzle" href="/games">
+			Discover all the games I have developed.
 		</Card>
 		<Card title="Contact me" icon="pen" href="/contact">
 			You can contact me here. I will be happy to answer you.
-		</Card>
-		<Card title="About me" icon="open-book" href="/about">
-			A summary of my background and skills.
 		</Card>
 	</CardGrid>
 </StarlightPage>

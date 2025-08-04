@@ -41,6 +41,10 @@ export default defineConfig({
           link: "/games",
         },
         {
+          label: "TeamZBL",
+          autogenerate: { directory: "teamzbl" },
+        },
+        {
           label: "Documentation",
           autogenerate: { directory: "documentation" },
         },
@@ -49,22 +53,24 @@ export default defineConfig({
           items: [
             {
               label: "llms.txt",
-              link: "/llms.txt"
+              link: "/llms.txt",
             },
             {
               label: "llms-small.txt",
-              link: "/llms-small.txt"
+              link: "/llms-small.txt",
             },
             {
               label: "llms-full.txt",
-              link: "/llms-full.txt"
-            }
-          ]
-        }
+              link: "/llms-full.txt",
+            },
+          ],
+        },
       ],
-      plugins: [starlightLlmsTxt({
-        exclude: ["documentation/*"]
-      })],
+      plugins: [
+        starlightLlmsTxt({
+          exclude: ["documentation/*"],
+        }),
+      ],
     }),
   ],
 });

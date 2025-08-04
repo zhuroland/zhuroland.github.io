@@ -5,25 +5,22 @@ author: Roland ZHU
 ---
 
 import { CardGrid } from "@astrojs/starlight/components";
-import Card from "../../../components/my-card.astro";
+import Card from "../../../components/card.astro";
+import Contributor from "../../../components/contributor.astro";
+import TechStack from "../../../components/tech-stack.astro";
 
 <CardGrid>
-	<Card target title="Chatbot">
-			<p>An intelligent conversational AI powered by large language models, designed with a modular architecture for seamless integration across multiple platforms and websites.</p>
-			<p>Made with <strong>React</strong>, <strong>Bun</strong></p>
-			<small>Worked on with <strong><a href="https://www.linkedin.com/in/nguyen-khai-phan/">Khai</a></strong></small>
-		</Card>
 	  <Card target title="KRYP Ticket" href="https://kryp-ticket.vercel.app">
 			<p>A ticket system made for student, to help each other.</p>
-			<p>Made with <strong>Next.js</strong></p>
-			<small>Worked on with <strong>Khai</strong></small>
+			<TechStack stacks={["Next.js"]} />
+			<Contributor pre="Worked on with " name="khai" target="linkedin" />
 		</Card>
 		<Card title="FlowVerse">
 			<p>
 				Automate the evaluation of candidate soft skills efficiently using AI.
 			</p>
-			<p>Made with <strong>Next.js</strong>, <strong>Hono</strong></p>
-			<small>Worked on with <strong>group</strong></small>
+			<TechStack stacks={["Next.js", "Hono"]} />
+			<Contributor pre="Worked on with " name="group" />
 		</Card>
 		<Card title="Crep'Way">
 
@@ -34,8 +31,8 @@ import Card from "../../../components/my-card.astro";
     		- The admin can manage the menu and the orders.
     		- The API is used by the client and the admin.
 
-    		<p>Made with **Next.js**, **Elysia**</p>
-    		<small>Worked on with **group**</small>
+    		<TechStack stacks={["Next.js", "Elysia"]} />
+    		<Contributor pre="Worked on with " name="group" />
     	</Card>
 
 </CardGrid>

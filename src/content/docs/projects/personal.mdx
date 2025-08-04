@@ -5,12 +5,13 @@ author: Roland ZHU
 ---
 
 import { CardGrid } from '@astrojs/starlight/components';
-import Card from '../../../components/my-card.astro';
+import Card from '../../../components/card.astro';
+import TechStack from '../../../components/tech-stack.astro';
 
 <CardGrid>
 	<Card target title="Chinese Dico" href="https://chinese-dico.vercel.app">
 		<p>A Chinese - French dictionary</p>
-		<p>Made with <strong>Next.js</strong></p>
+		<TechStack stacks={["Next.js"]} />
 	</Card>
 	<Card
 		target
@@ -18,6 +19,6 @@ import Card from '../../../components/my-card.astro';
 		href="https://light-tiles-off.vercel.app"
 	>
 		<p>Just a game, have fun!</p>
-		<p>Made with <strong>Next.js</strong></p>
+		<TechStack stacks={["Next.js"]} />
 	</Card>
 </CardGrid>

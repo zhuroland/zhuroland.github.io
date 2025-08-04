@@ -5,7 +5,9 @@ author: Roland ZHU
 ---
 
 import { CardGrid } from '@astrojs/starlight/components';
-import Card from '../../../components/my-card.astro';
+import Card from '../../../components/card.astro';
+import Contributor from '../../../components/contributor.astro';
+import TechStack from '../../../components/tech-stack.astro';
 
 <CardGrid>
 	<Card title="Hyrule Castle">
@@ -13,7 +15,7 @@ import Card from '../../../components/my-card.astro';
 				A game on terminal, we need to beat the enemie to get on the next floor.
 				There's many characters with different abilities
 			</p>
-			<p>Made with <strong>Typescript</strong></p>
+			<TechStack stacks={["Typescript"]} />
 		</Card>
 		<Card title="Free GG">
 			<p>
@@ -21,6 +23,6 @@ import Card from '../../../components/my-card.astro';
 				<a href="https://www.freetogame.com/api-doc" target="_blank"
 					>FreeToGame API</a>.
 			</p>
-			<p>Made with <strong>Expo</strong></p>
+			<TechStack stacks={["Expo"]} />
 		</Card>
 </CardGrid>

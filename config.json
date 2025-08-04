@@ -1,11 +1,17 @@
 {
-	"$schema": "https://gist.github.com/TheMysteryz/037c8bd90e0c4ab5897bbf78abd5e345/raw/0d576733302d252d22cb5bcc2539e3859e67c1e6/zr-page-conf",
-	"infos": {
-		"author": "Roland ZHU",
-		"birthdate": "1999-05-19",
-		"socials": {
-			"github": "https://github.com/TheMysteryz",
-			"linkedin": "https://www.linkedin.com/in/zhuroland"
-		}
-	}
+  "$schema": "./config.schema.json",
+  "infos": {
+    "author": "Roland ZHU",
+    "birthdate": "1999-05-19",
+    "socials": {
+      "github": "https://github.com/TheMysteryz",
+      "linkedin": "https://www.linkedin.com/in/zhuroland"
+    }
+  },
+  "contributors": {
+    "khai": {
+      "linkedin": "https://www.linkedin.com/in/nguyen-khai-phan",
+      "github": "https://github.com/khai"
+    }
+  }
 }
