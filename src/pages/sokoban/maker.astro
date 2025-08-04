@@ -1,99 +1,108 @@
 ---
+import Layout from "../../layouts/SokobanLayout.astro";
 import Button from "../../components/button.astro";
 ---
 
-<div class="navigation">
-  <h1>Sokoban Level Maker</h1>
-  <Button href="/games">Go back</Button>
-  <Button href="/sokoban">Play Sokoban</Button>
-</div>
+<Layout
+  title="Sokoban Level Maker"
+  description="Create and customize your own Sokoban levels easily."
+>
+  <div class="navigation">
+    <h1>Sokoban Level Maker</h1>
+    <Button href="/games">Go back</Button>
+    <Button href="/sokoban">Play Sokoban</Button>
+  </div>
 
-<div class="maker-container">
-  <div class="side-panel">
-    <h3>Blocks</h3>
-    <div class="block-selector">
-      <button class="block-button selected" data-block-type="floor">
-        <img src="/assets/sokoban/ground.png" alt="Floor" />
-        <span>Floor</span>
-      </button>
-      <button class="block-button" data-block-type="wall">
-        <img src="/assets/sokoban/wall.png" alt="Wall" />
-        <span>Wall</span>
-      </button>
-      <button class="block-button" data-block-type="target">
-        <img src="/assets/sokoban/target.png" alt="Target" />
-        <span>Target</span>
-      </button>
-      <button class="block-button" data-block-type="box">
-        <img src="/assets/sokoban/box.png" alt="Box" />
-        <span>Box</span>
-      </button>
-      <button class="block-button" data-block-type="player">
-        <img src="/assets/sokoban/cat.png" alt="Player" />
-        <span>Player</span>
-      </button>
-      <button class="block-button" data-block-type="box_on_target">
-        <div class="combined-image">
+  <div class="maker-container">
+    <div class="side-panel">
+      <h3>Blocks</h3>
+      <div class="block-selector">
+        <button class="block-button selected" data-block-type="floor">
+          <img src="/assets/sokoban/ground.png" alt="Floor" />
+          <span>Floor</span>
+        </button>
+        <button class="block-button" data-block-type="wall">
+          <img src="/assets/sokoban/wall.png" alt="Wall" />
+          <span>Wall</span>
+        </button>
+        <button class="block-button" data-block-type="target">
+          <img src="/assets/sokoban/target.png" alt="Target" />
+          <span>Target</span>
+        </button>
+        <button class="block-button" data-block-type="box">
           <img src="/assets/sokoban/box.png" alt="Box" />
-          <div class="overlay"></div>
+          <span>Box</span>
+        </button>
+        <button class="block-button" data-block-type="player">
+          <img src="/assets/sokoban/cat.png" alt="Player" />
+          <span>Player</span>
+        </button>
+        <button class="block-button" data-block-type="box_on_target">
+          <div class="combined-image">
+            <img src="/assets/sokoban/box.png" alt="Box" />
+            <div class="overlay"></div>
+          </div>
+          <span>Box on Target</span>
+        </button>
+      </div>
+
+      <div class="grid-controls">
+        <h3>Grid Size</h3>
+        <div class="grid-size">
+          <label>
+            Width (5-20):
+            <input type="number" id="grid-width" min="5" max="20" value="10" />
+          </label>
+          <label>
+            Height (5-20):
+            <input type="number" id="grid-height" min="5" max="20" value="10" />
+          </label>
+          <button id="resize-grid">Resize Grid</button>
         </div>
-        <span>Box on Target</span>
-      </button>
-    </div>
+      </div>
 
-    <div class="grid-controls">
-      <h3>Grid Size</h3>
-      <div class="grid-size">
-        <label>
-          Width (5-20):
-          <input type="number" id="grid-width" min="5" max="20" value="10" />
-        </label>
-        <label>
-          Height (5-20):
-          <input type="number" id="grid-height" min="5" max="20" value="10" />
-        </label>
-        <button id="resize-grid">Resize Grid</button>
+      <div class="actions">
+        <h3>Actions</h3>
+        <button id="clear-grid">Clear Grid</button>
+        <button id="fill-walls">Fill Border with Walls</button>
+        <button id="export-level">Export Level</button>
+      </div>
+
+      <div class="export-area">
+        <h3>Export</h3>
+        <textarea id="export-code" readonly rows="5"></textarea>
+        <div class="validation-message" id="validation-message"></div>
+      </div>
+
+      <div class="import-area">
+        <h3>Import Level</h3>
+        <textarea
+          id="import-code-area"
+          rows="5"
+          placeholder="Paste level JSON code here..."></textarea>
+        <button id="import-level-button">Import Level</button>
+        <div class="validation-message" id="import-validation-message"></div>
+      </div>
+
+      <div class="help-section">
+        <h3>Keyboard Shortcuts</h3>
+        <div class="shortcuts">
+          <div><strong>F</strong>: Floor</div>
+          <div><strong>W</strong>: Wall</div>
+          <div><strong>T</strong>: Target</div>
+          <div><strong>B</strong>: Box</div>
+          <div><strong>P</strong>: Player</div>
+          <div><strong>G</strong>: Box on Target</div>
+        </div>
+        <p class="tip">Tip: Click and drag to paint multiple tiles!</p>
       </div>
     </div>
 
-    <div class="actions">
-      <h3>Actions</h3>
-      <button id="clear-grid">Clear Grid</button>
-      <button id="fill-walls">Fill Border with Walls</button>
-      <button id="export-level">Export Level</button>
-    </div>
-
-    <div class="export-area">
-      <h3>Export</h3>
-      <textarea id="export-code" readonly rows="5"></textarea>
-      <div class="validation-message" id="validation-message"></div>
-    </div>
-
-    <div class="import-area">
-      <h3>Import Level</h3>
-      <textarea id="import-code-area" rows="5" placeholder="Paste level JSON code here..."></textarea>
-      <button id="import-level-button">Import Level</button>
-      <div class="validation-message" id="import-validation-message"></div>
-    </div>
-
-    <div class="help-section">
-      <h3>Keyboard Shortcuts</h3>
-      <div class="shortcuts">
-        <div><strong>F</strong>: Floor</div>
-        <div><strong>W</strong>: Wall</div>
-        <div><strong>T</strong>: Target</div>
-        <div><strong>B</strong>: Box</div>
-        <div><strong>P</strong>: Player</div>
-        <div><strong>G</strong>: Box on Target</div>
-      </div>
-      <p class="tip">Tip: Click and drag to paint multiple tiles!</p>
+    <div class="grid-container">
+      <div class="grid" id="level-grid"></div>
     </div>
   </div>
-
-  <div class="grid-container">
-    <div class="grid" id="level-grid"></div>
-  </div>
-</div>
+</Layout>
 
 <style>
   * {
@@ -520,9 +529,11 @@ import Button from "../../components/button.astro";
         this.exportLevel();
       });
 
-      document.getElementById("import-level-button")?.addEventListener("click", () => {
-        this.importLevel();
-      });
+      document
+        .getElementById("import-level-button")
+        ?.addEventListener("click", () => {
+          this.importLevel();
+        });
     }
 
     private handleMouseDown(e: MouseEvent): void {
@@ -780,24 +791,37 @@ import Button from "../../components/button.astro";
           const cell = this.grid[y][x];
           let char = " "; // Default to floor
           switch (cell.type) {
-            case "wall": char = "W"; break;
-            case "floor": char = " "; break;
-            case "target": char = "T"; break;
-            case "box": char = "B"; break;
-            case "player": char = "P"; break;
-            case "box_on_target": char = "G"; break;
+            case "wall":
+              char = "W";
+              break;
+            case "floor":
+              char = " ";
+              break;
+            case "target":
+              char = "T";
+              break;
+            case "box":
+              char = "B";
+              break;
+            case "player":
+              char = "P";
+              break;
+            case "box_on_target":
+              char = "G";
+              break;
           }
           rowString += char;
         }
         levelDataMap.push(rowString);
       }
-      
+
       const levelObject = { map: levelDataMap };
       const levelCode = JSON.stringify(levelObject, null, 2); // Output valid JSON
       this.exportCodeElement.value = levelCode;
-      
+
       // Show success message
-      this.validationMessageElement.textContent = "Level exported successfully as JSON! Copy this code.";
+      this.validationMessageElement.textContent =
+        "Level exported successfully as JSON! Copy this code.";
       this.validationMessageElement.className = "validation-message success";
     }
 
@@ -807,25 +831,38 @@ import Button from "../../components/button.astro";
       this.importValidationMessageElement.className = "validation-message";
 
       if (!levelCodeString) {
-        this.importValidationMessageElement.textContent = "Error: No level code provided.";
-        this.importValidationMessageElement.className = "validation-message error";
+        this.importValidationMessageElement.textContent =
+          "Error: No level code provided.";
+        this.importValidationMessageElement.className =
+          "validation-message error";
         return;
       }
 
       try {
         const parsedLevel = JSON.parse(levelCodeString);
 
-        if (!parsedLevel || !parsedLevel.map || !Array.isArray(parsedLevel.map)) {
-          this.importValidationMessageElement.textContent = "Error: Invalid level structure. Missing 'map' array.";
-          this.importValidationMessageElement.className = "validation-message error";
+        if (
+          !parsedLevel ||
+          !parsedLevel.map ||
+          !Array.isArray(parsedLevel.map)
+        ) {
+          this.importValidationMessageElement.textContent =
+            "Error: Invalid level structure. Missing 'map' array.";
+          this.importValidationMessageElement.className =
+            "validation-message error";
           return;
         }
 
         const newMap = parsedLevel.map as string[];
-        if (newMap.length === 0 || newMap.some(row => typeof row !== 'string')) {
-            this.importValidationMessageElement.textContent = "Error: Invalid map data. Must be an array of strings.";
-            this.importValidationMessageElement.className = "validation-message error";
-            return;
+        if (
+          newMap.length === 0 ||
+          newMap.some((row) => typeof row !== "string")
+        ) {
+          this.importValidationMessageElement.textContent =
+            "Error: Invalid map data. Must be an array of strings.";
+          this.importValidationMessageElement.className =
+            "validation-message error";
+          return;
         }
 
         const newHeight = newMap.length;
@@ -833,16 +870,19 @@ import Button from "../../components/button.astro";
 
         if (newHeight < 5 || newHeight > 20 || newWidth < 5 || newWidth > 20) {
           this.importValidationMessageElement.textContent = `Error: Invalid grid dimensions. Width/Height must be between 5 and 20. Detected: ${newWidth}x${newHeight}`;
-          this.importValidationMessageElement.className = "validation-message error";
+          this.importValidationMessageElement.className =
+            "validation-message error";
           return;
         }
 
         // Update grid dimensions and recreate
         this.gridWidth = newWidth;
         this.gridHeight = newHeight;
-        (document.getElementById("grid-width") as HTMLInputElement).value = newWidth.toString();
-        (document.getElementById("grid-height") as HTMLInputElement).value = newHeight.toString();
-        
+        (document.getElementById("grid-width") as HTMLInputElement).value =
+          newWidth.toString();
+        (document.getElementById("grid-height") as HTMLInputElement).value =
+          newHeight.toString();
+
         this.createGrid(); // Reinitializes grid and clears playerPosition
 
         let tempPlayerPosition: { x: number; y: number } | null = null;
@@ -852,65 +892,100 @@ import Button from "../../components/button.astro";
         for (let y = 0; y < this.gridHeight; y++) {
           if (!newMap[y] || newMap[y].length !== this.gridWidth) {
             this.importValidationMessageElement.textContent = `Error: Inconsistent row length or missing row at row ${y + 1}. Expected ${this.gridWidth}, got ${newMap[y]?.length || 0}.`;
-            this.importValidationMessageElement.className = "validation-message error";
-            this.clearGrid(); 
+            this.importValidationMessageElement.className =
+              "validation-message error";
+            this.clearGrid();
             return;
           }
           for (let x = 0; x < this.gridWidth; x++) {
             const char = newMap[y][x];
-            let cellTypeToSet: CellType = "floor"; 
+            let cellTypeToSet: CellType = "floor";
 
             switch (char) {
-              case "W": cellTypeToSet = "wall"; break;
-              case " ": cellTypeToSet = "floor"; break;
-              case "T": cellTypeToSet = "target"; targetCount++; break;
-              case "B": cellTypeToSet = "box"; boxCount++; break;
+              case "W":
+                cellTypeToSet = "wall";
+                break;
+              case " ":
+                cellTypeToSet = "floor";
+                break;
+              case "T":
+                cellTypeToSet = "target";
+                targetCount++;
+                break;
+              case "B":
+                cellTypeToSet = "box";
+                boxCount++;
+                break;
               case "P":
                 cellTypeToSet = "player";
                 if (tempPlayerPosition) {
-                    this.importValidationMessageElement.textContent = "Error: Multiple players defined in level code.";
-                    this.importValidationMessageElement.className = "validation-message error";
-                    this.clearGrid(); return;
+                  this.importValidationMessageElement.textContent =
+                    "Error: Multiple players defined in level code.";
+                  this.importValidationMessageElement.className =
+                    "validation-message error";
+                  this.clearGrid();
+                  return;
                 }
                 tempPlayerPosition = { x, y };
                 break;
-              case "G": cellTypeToSet = "box_on_target"; boxCount++; targetCount++; break;
+              case "G":
+                cellTypeToSet = "box_on_target";
+                boxCount++;
+                targetCount++;
+                break;
               default:
-                this.importValidationMessageElement.textContent = `Error: Unknown character '${char}' in level code at row ${y+1}, col ${x+1}.`;
-                this.importValidationMessageElement.className = "validation-message error";
-                this.clearGrid(); return;
+                this.importValidationMessageElement.textContent = `Error: Unknown character '${char}' in level code at row ${y + 1}, col ${x + 1}.`;
+                this.importValidationMessageElement.className =
+                  "validation-message error";
+                this.clearGrid();
+                return;
             }
             this.grid[y][x].type = cellTypeToSet;
             this.setCellToType(this.grid[y][x].element, cellTypeToSet);
           }
         }
-        
+
         this.playerPosition = tempPlayerPosition; // Set player position after successful parsing of all cells
 
-        if (!this.playerPosition) { // Check if player was actually found and set
-            this.importValidationMessageElement.textContent = "Error: Imported level must have a player.";
-            this.importValidationMessageElement.className = "validation-message error";
-            this.clearGrid(); return;
+        if (!this.playerPosition) {
+          // Check if player was actually found and set
+          this.importValidationMessageElement.textContent =
+            "Error: Imported level must have a player.";
+          this.importValidationMessageElement.className =
+            "validation-message error";
+          this.clearGrid();
+          return;
         }
 
-        if ((boxCount > 0 || targetCount > 0) && (boxCount === 0 || targetCount === 0)) {
-             this.importValidationMessageElement.textContent = "Error: Imported level must have at least one box AND one target if either is present and non-zero.";
-             this.importValidationMessageElement.className = "validation-message error";
-             this.clearGrid(); return;
+        if (
+          (boxCount > 0 || targetCount > 0) &&
+          (boxCount === 0 || targetCount === 0)
+        ) {
+          this.importValidationMessageElement.textContent =
+            "Error: Imported level must have at least one box AND one target if either is present and non-zero.";
+          this.importValidationMessageElement.className =
+            "validation-message error";
+          this.clearGrid();
+          return;
         }
         if (boxCount !== targetCount) {
-            this.importValidationMessageElement.textContent = `Error: Imported level has ${boxCount} boxes and ${targetCount} targets. They must match.`;
-            this.importValidationMessageElement.className = "validation-message error";
-            this.clearGrid(); return;
+          this.importValidationMessageElement.textContent = `Error: Imported level has ${boxCount} boxes and ${targetCount} targets. They must match.`;
+          this.importValidationMessageElement.className =
+            "validation-message error";
+          this.clearGrid();
+          return;
         }
 
-        this.importValidationMessageElement.textContent = "Level imported successfully!";
-        this.importValidationMessageElement.className = "validation-message success";
+        this.importValidationMessageElement.textContent =
+          "Level imported successfully!";
+        this.importValidationMessageElement.className =
+          "validation-message success";
         this.validationMessageElement.textContent = ""; // Clear export validation message
-
       } catch (error) {
-        this.importValidationMessageElement.textContent = "Error: Could not parse level code. Ensure it's valid JSON.";
-        this.importValidationMessageElement.className = "validation-message error";
+        this.importValidationMessageElement.textContent =
+          "Error: Could not parse level code. Ensure it's valid JSON.";
+        this.importValidationMessageElement.className =
+          "validation-message error";
         console.error("Error importing level:", error);
         this.clearGrid(); // Attempt to clear to a known state on parsing error
       }
@@ -954,7 +1029,7 @@ import Button from "../../components/button.astro";
         this.validationMessageElement.className = "validation-message error";
         return false;
       }
-      
+
       if (boxCount > targetCount) {
         this.validationMessageElement.textContent = `Warning: There are more boxes (${boxCount}) than targets (${targetCount}). Some boxes cannot be placed on targets.`;
         this.validationMessageElement.className = "validation-message error";

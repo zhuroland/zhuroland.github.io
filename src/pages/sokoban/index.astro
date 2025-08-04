@@ -1,21 +1,24 @@
 ---
+import Layout from "../../layouts/SokobanLayout.astro";
 import Button from "../../components/button.astro";
 ---
 
-<div class="navigation">
-  <h1>Sokoban Game</h1>
-  <Button href="/games">Go back</Button>
-  <Button href="/sokoban/maker">Level Maker</Button>
-</div>
-
-<div class="game-container">
-  <canvas data-canvas-game width="800" height="600"></canvas>
-  <div class="controls">
-    <button data-canvas-restart>Restart Level</button>
-    <button data-canvas-prev>Previous Level</button>
-    <button data-canvas-next>Next Level</button>
+<Layout title="Sokoban Game" description="Play Sokoban, a classic puzzle game where you push boxes to their targets.">
+  <div class="navigation">
+    <h1>Sokoban Game</h1>
+    <Button href="/games">Go back</Button>
+    <Button href="/sokoban/maker">Level Maker</Button>
   </div>
-</div>
+
+  <div class="game-container">
+    <canvas data-canvas-game width="800" height="600"></canvas>
+    <div class="controls">
+      <button data-canvas-restart>Restart Level</button>
+      <button data-canvas-prev>Previous Level</button>
+      <button data-canvas-next>Next Level</button>
+    </div>
+  </div>
+</Layout>
 
 <style>
   .navigation {
