@@ -22,12 +22,12 @@ const { href, target, title, icon } = Astro.props;
             href={href}
             target={target ? "_blank" : ""}
             aria-label={`Navigate to ${title}`}
+            class="external-link"
           >
-            <span set:html={title} />
-            <Icon name="external" class="external" />
+            {title}
           </a>
         ) : (
-          <span set:html={title} />
+          <span>{title}</span>
         )
       }
     </p>
@@ -95,14 +95,21 @@ const { href, target, title, icon } = Astro.props;
     );
   }
   a {
-    display: inline-flex;
+    display: inline;
     color: inherit !important;
     text-decoration: none;
   }
   a:hover {
     text-decoration: underline;
   }
-  .external {
-    margin-left: 0.25rem;
+  .external-link::after {
+    content: "";
+    background-image: url("./assets/svg/external.svg");
+    position: absolute;
+    scale: 1.2;
+    width: 1rem;
+    height: 1rem;
+    margin-top: 0.2rem;
+    margin-left: 0.2rem;
   }
 </style>
