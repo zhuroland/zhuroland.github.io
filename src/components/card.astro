@@ -102,6 +102,9 @@ const { href, target, title, icon } = Astro.props;
   a:hover {
     text-decoration: underline;
   }
+  .external-link {
+    position: relative;
+  }
   .external-link::after {
     content: "";
     background-image: url("./assets/svg/external.svg");
