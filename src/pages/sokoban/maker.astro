@@ -66,6 +66,8 @@ import Button from "../../components/button.astro";
         <button id="clear-grid">Clear Grid</button>
         <button id="fill-walls">Fill Border with Walls</button>
         <button id="export-level">Export Level</button>
+  <button id="play-test-toggle">Play Test</button>
+  <button id="reset-play-test" style="display:none;">Reset Test</button>
       </div>
 
       <div class="export-area">
@@ -93,6 +95,8 @@ import Button from "../../components/button.astro";
           <div><strong>B</strong>: Box</div>
           <div><strong>P</strong>: Player</div>
           <div><strong>G</strong>: Box on Target</div>
+          <div><strong>E</strong>: Toggle Play Mode</div>
+          <div><strong>R</strong>: Reset (Play Mode)</div>
         </div>
         <p class="tip">Tip: Click and drag to paint multiple tiles!</p>
       </div>
@@ -368,7 +372,8 @@ import Button from "../../components/button.astro";
     | "target"
     | "box"
     | "player"
-    | "box_on_target";
+  | "box_on_target"
+  | "player_on_target"; // only used in play mode
 
   interface Cell {
     type: CellType;
@@ -388,6 +393,9 @@ import Button from "../../components/button.astro";
     private importCodeAreaElement: HTMLTextAreaElement;
     private importValidationMessageElement: HTMLElement;
     private isPainting = false;
+  private isPlayMode = false;
+  private playModeSnapshot: CellType[][] | null = null;
+  private playModePlayerStart: { x: number; y: number } | null = null;
 
     constructor() {
       // Initialize DOM elements
@@ -466,6 +474,9 @@ import Button from "../../components/button.astro";
 
       // Keyboard shortcuts
       document.addEventListener("keydown", (e) => {
+        // Ignore when typing in inputs or textareas
+        const tag = (e.target as HTMLElement)?.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
         switch (e.key) {
           case "f": // Floor
             this.selectBlockType("floor");
@@ -484,6 +495,18 @@ import Button from "../../components/button.astro";
             break;
           case "g": // Box on target
             this.selectBlockType("box_on_target");
+            break;
+          case "e": // Enter/Exit play mode
+            if (this.isPlayMode) {
+              this.exitPlayMode();
+            } else {
+              this.enterPlayMode();
+            }
+            break;
+          case "r": // Reset play mode
+            if (this.isPlayMode) {
+              this.resetPlayMode();
+            }
             break;
           case "Escape": // Cancel painting
             this.stopPainting();
@@ -534,6 +557,20 @@ import Button from "../../components/button.astro";
         ?.addEventListener("click", () => {
           this.importLevel();
         });
+
+      // Play test toggle
+      document.getElementById("play-test-toggle")?.addEventListener("click", () => {
+        if (this.isPlayMode) {
+          this.exitPlayMode();
+        } else {
+          this.enterPlayMode();
+        }
+      });
+      document.getElementById("reset-play-test")?.addEventListener("click", () => {
+        if (this.isPlayMode) {
+          this.resetPlayMode();
+        }
+      });
     }
 
     private handleMouseDown(e: MouseEvent): void {
@@ -745,6 +782,38 @@ import Button from "../../components/button.astro";
           container.appendChild(boxImg);
           container.appendChild(greenMask);
           cellElement.appendChild(container);
+          break;
+        case "player_on_target":
+          // target + player
+          const wrap = document.createElement("div");
+          wrap.style.position = "relative";
+          wrap.style.width = "100%";
+          wrap.style.height = "100%";
+
+          const tImg = document.createElement("img");
+          tImg.src = "/assets/sokoban/target.png";
+          tImg.alt = "Target";
+          tImg.style.position = "absolute";
+          tImg.style.top = "0";
+          tImg.style.left = "0";
+          tImg.style.width = "100%";
+          tImg.style.height = "100%";
+          tImg.style.imageRendering = "pixelated";
+
+          const pImg = document.createElement("img");
+          pImg.src = "/assets/sokoban/cat.png";
+          pImg.alt = "Player";
+          pImg.style.position = "absolute";
+          pImg.style.top = "0";
+          pImg.style.left = "0";
+          pImg.style.width = "100%";
+          pImg.style.height = "100%";
+          pImg.style.zIndex = "1";
+          pImg.style.imageRendering = "pixelated";
+
+          wrap.appendChild(tImg);
+          wrap.appendChild(pImg);
+          cellElement.appendChild(wrap);
           break;
       }
     }
@@ -1037,6 +1106,162 @@ import Button from "../../components/button.astro";
       }
 
       return true;
+    }
+
+    // --- Play Mode Logic ---
+    private enterPlayMode(): void {
+      if (!this.validateLevel()) return;
+      // snapshot grid
+      this.playModeSnapshot = this.grid.map((row) => row.map((c) => c.type));
+      this.playModePlayerStart = this.playerPosition
+        ? { ...this.playerPosition }
+        : null;
+      this.isPlayMode = true;
+      (document.getElementById("play-test-toggle") as HTMLButtonElement).textContent =
+        "Stop Test";
+      (document.getElementById("reset-play-test") as HTMLButtonElement).style.display =
+        "block";
+      this.validationMessageElement.textContent =
+        "Play mode: Use arrow keys or WASD to move. Push all boxes onto targets.";
+      this.validationMessageElement.className = "validation-message";
+      // Add key listener for movement (reuse existing keydown by enhancing it)
+      document.addEventListener("keydown", this.playKeyHandler);
+    }
+
+    private exitPlayMode(): void {
+      this.isPlayMode = false;
+      (document.getElementById("play-test-toggle") as HTMLButtonElement).textContent =
+        "Play Test";
+      (document.getElementById("reset-play-test") as HTMLButtonElement).style.display =
+        "none";
+      document.removeEventListener("keydown", this.playKeyHandler);
+      // restore snapshot
+      if (this.playModeSnapshot) {
+        for (let y = 0; y < this.gridHeight; y++) {
+          for (let x = 0; x < this.gridWidth; x++) {
+            const t = this.playModeSnapshot[y][x];
+            this.grid[y][x].type = t;
+            this.setCellToType(this.grid[y][x].element, t);
+          }
+        }
+        this.playerPosition = this.playModePlayerStart
+          ? { ...this.playModePlayerStart }
+          : null;
+      }
+      this.validationMessageElement.textContent = "Exited play mode.";
+      this.validationMessageElement.className = "validation-message";
+    }
+
+    private resetPlayMode(): void {
+      if (!this.isPlayMode || !this.playModeSnapshot) return;
+      for (let y = 0; y < this.gridHeight; y++) {
+        for (let x = 0; x < this.gridWidth; x++) {
+          const t = this.playModeSnapshot[y][x];
+          this.grid[y][x].type = t;
+          this.setCellToType(this.grid[y][x].element, t);
+        }
+      }
+      this.playerPosition = this.playModePlayerStart
+        ? { ...this.playModePlayerStart }
+        : null;
+      this.validationMessageElement.textContent =
+        "Play mode reset. Try again.";
+      this.validationMessageElement.className = "validation-message";
+    }
+
+    private playKeyHandler = (e: KeyboardEvent) => {
+      if (!this.isPlayMode) return;
+      const keyMap: Record<string, [number, number]> = {
+        ArrowUp: [0, -1],
+        w: [0, -1],
+        ArrowDown: [0, 1],
+        s: [0, 1],
+        ArrowLeft: [-1, 0],
+        a: [-1, 0],
+        ArrowRight: [1, 0],
+        d: [1, 0],
+      };
+      if (keyMap[e.key]) {
+        e.preventDefault();
+        const [dx, dy] = keyMap[e.key];
+        this.attemptMove(dx, dy);
+      }
+    };
+
+    private attemptMove(dx: number, dy: number): void {
+      if (!this.playerPosition) return;
+      const { x, y } = this.playerPosition;
+      const nx = x + dx;
+      const ny = y + dy;
+      if (nx < 0 || nx >= this.gridWidth || ny < 0 || ny >= this.gridHeight)
+        return;
+      const targetCell = this.grid[ny][nx];
+      if (targetCell.type === "wall") return;
+      // Pushing logic
+      if (targetCell.type === "box" || targetCell.type === "box_on_target") {
+        const bx = nx + dx;
+        const by = ny + dy;
+        if (
+          bx < 0 ||
+          bx >= this.gridWidth ||
+          by < 0 ||
+          by >= this.gridHeight
+        )
+          return;
+        const beyond = this.grid[by][bx];
+        if (
+          beyond.type === "wall" ||
+          beyond.type === "box" ||
+          beyond.type === "box_on_target"
+        )
+          return; // cannot push
+        // move box
+        if (beyond.type === "target") {
+          beyond.type = "box_on_target";
+        } else if (beyond.type === "floor") {
+          beyond.type = "box";
+        } else if (beyond.type === "player_on_target") {
+          // shouldn't happen
+          return;
+        }
+        this.setCellToType(beyond.element, beyond.type);
+        // Vacated target cell after box moves
+        if (targetCell.type === "box_on_target") {
+          targetCell.type = "target"; // underlying target remains for player to occupy
+        } else {
+          targetCell.type = "floor";
+        }
+      }
+      // Move player
+      const currentCell = this.grid[y][x];
+      if (currentCell.type === "player_on_target") {
+        currentCell.type = "target";
+      } else {
+        currentCell.type = "floor";
+      }
+      this.setCellToType(currentCell.element, currentCell.type);
+
+      // Destination cell after potential box push
+      if (targetCell.type === "target") {
+        targetCell.type = "player_on_target";
+      } else if (targetCell.type === "floor") {
+        targetCell.type = "player";
+      }
+      this.setCellToType(targetCell.element, targetCell.type);
+      this.playerPosition = { x: nx, y: ny };
+      this.checkWinCondition();
+    }
+
+    private checkWinCondition(): void {
+      // win if no bare targets remain
+      for (let y = 0; y < this.gridHeight; y++) {
+        for (let x = 0; x < this.gridWidth; x++) {
+          if (this.grid[y][x].type === "target") return; // still unsatisfied
+        }
+      }
+      this.validationMessageElement.textContent =
+        "Solved! All targets are covered. You can export or continue editing.";
+      this.validationMessageElement.className = "validation-message success";
     }
   }
 
