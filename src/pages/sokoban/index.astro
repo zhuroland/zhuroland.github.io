@@ -200,6 +200,11 @@ import Button from "../../components/button.astro";
             gameMap[y][x] = "floor";
             playerPos = { x, y };
             break;
+          case "+": // player on target
+            gameMap[y][x] = "target";
+            targets.push({ x, y });
+            playerPos = { x, y };
+            break;
           default:
             gameMap[y][x] = "floor";
         }

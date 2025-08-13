@@ -44,6 +44,14 @@ import Button from "../../components/button.astro";
           </div>
           <span>Box on Target</span>
         </button>
+        <button class="block-button" data-block-type="player_on_target">
+          <div class="combined-image">
+            <img src="/assets/sokoban/target.png" alt="Target" />
+            <img src="/assets/sokoban/cat.png" alt="Player" style="z-index:1;" />
+            <div class="overlay"></div>
+          </div>
+          <span>Player on Target</span>
+        </button>
       </div>
 
       <div class="grid-controls">
@@ -95,6 +103,7 @@ import Button from "../../components/button.astro";
           <div><strong>B</strong>: Box</div>
           <div><strong>P</strong>: Player</div>
           <div><strong>G</strong>: Box on Target</div>
+          <div><strong>O</strong>: Player on Target</div>
           <div><strong>E</strong>: Toggle Play Mode</div>
           <div><strong>R</strong>: Reset (Play Mode)</div>
         </div>
@@ -173,9 +182,19 @@ import Button from "../../components/button.astro";
   }
 
   .block-button span {
+    color: #4a5568;
     margin-top: 0.25rem;
     font-size: 0.8rem;
     text-align: center;
+  }
+  /* Hover (only when not selected) */
+  .block-button:hover:not(.selected) span {
+    color: #ffffff;
+  }
+  /* Selected state text styling */
+  .block-button.selected span {
+    color: #1a202c;
+    font-weight: 600;
   }
 
   .combined-image {
@@ -496,6 +515,9 @@ import Button from "../../components/button.astro";
           case "g": // Box on target
             this.selectBlockType("box_on_target");
             break;
+          case "o": // Player on target
+            this.selectBlockType("player_on_target");
+            break;
           case "e": // Enter/Exit play mode
             if (this.isPlayMode) {
               this.exitPlayMode();
@@ -683,13 +705,19 @@ import Button from "../../components/button.astro";
       const cell = this.grid[y][x];
 
       // Handle player placement (can only be placed once)
-      if (this.selectedBlockType === "player") {
+      if (this.selectedBlockType === "player" || this.selectedBlockType === "player_on_target") {
         if (this.playerPosition) {
           // Remove previous player
           const prevCell =
             this.grid[this.playerPosition.y][this.playerPosition.x];
-          prevCell.type = "floor";
-          this.setCellToType(prevCell.element, "floor");
+          // Restore underlying tile
+          if (prevCell.type === "player_on_target") {
+            prevCell.type = "target";
+            this.setCellToType(prevCell.element, "target");
+          } else {
+            prevCell.type = "floor";
+            this.setCellToType(prevCell.element, "floor");
+          }
         }
         this.playerPosition = { x, y };
       }
@@ -813,6 +841,16 @@ import Button from "../../components/button.astro";
 
           wrap.appendChild(tImg);
           wrap.appendChild(pImg);
+          // green highlight overlay (same style as box_on_target)
+          const playerMask = document.createElement("div");
+          playerMask.style.position = "absolute";
+          playerMask.style.top = "0";
+          playerMask.style.left = "0";
+          playerMask.style.width = "100%";
+          playerMask.style.height = "100%";
+          playerMask.style.backgroundColor = "rgba(0,255,0,0.35)";
+          playerMask.style.zIndex = "2";
+          wrap.appendChild(playerMask);
           cellElement.appendChild(wrap);
           break;
       }
@@ -877,6 +915,9 @@ import Button from "../../components/button.astro";
               break;
             case "box_on_target":
               char = "G";
+              break;
+            case "player_on_target":
+              char = "+";
               break;
           }
           rowString += char;
@@ -1001,6 +1042,19 @@ import Button from "../../components/button.astro";
                 cellTypeToSet = "box_on_target";
                 boxCount++;
                 targetCount++;
+                break;
+              case "+":
+                cellTypeToSet = "player_on_target";
+                targetCount++;
+                if (tempPlayerPosition) {
+                  this.importValidationMessageElement.textContent =
+                    "Error: Multiple players defined in level code.";
+                  this.importValidationMessageElement.className =
+                    "validation-message error";
+                  this.clearGrid();
+                  return;
+                }
+                tempPlayerPosition = { x, y };
                 break;
               default:
                 this.importValidationMessageElement.textContent = `Error: Unknown character '${char}' in level code at row ${y + 1}, col ${x + 1}.`;
