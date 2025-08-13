@@ -7,9 +7,10 @@ type Props = {
   icon: Icons;
   href?: string;
   target?: boolean;
+  image?: { src: string; alt: string; title: string };
 };
 
-const { href, target, title, icon } = Astro.props;
+const { href, target, title, icon, image } = Astro.props;
 ---
 
 <article class="card sl-flex">
@@ -33,6 +34,14 @@ const { href, target, title, icon } = Astro.props;
     </p>
   </div>
   <div class="body">
+    {image && (
+      <img
+        src={image.src}
+        width="150"
+        alt={image.alt}
+        title={image.title}
+      />
+    )}
     <slot />
   </div>
 </article>

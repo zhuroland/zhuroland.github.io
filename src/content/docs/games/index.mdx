@@ -10,17 +10,15 @@ import TechStack from '../../../components/tech-stack.astro';
 This is a list of games I've made or worked on.
 
 <CardGrid>
-  <Card title="Sokoban" href="/sokoban" icon="puzzle">
-    <img src="/assets/sokoban/sokoban-game.png" width="150" alt="sokoban" title="Sokoba gamen" />
+  <Card title="Sokoban" href="/sokoban" icon="puzzle" image={{ src: "/assets/sokoban/sokoban-game.png", alt: "sokoban", title: "Sokoban game" }}>
     <p>
       A puzzle game where the player pushes boxes around a grid to
       reach the target positions.
     </p>
     <TechStack stacks={["HTML", "CSS", "JavaScript"]} />
   </Card>
-  
-  <Card title="Sokoban Level Maker" href="/sokoban/maker" icon="pencil">
-    <img src="/assets/sokoban/sokoban-maker.png" width="200" alt="sokoban" title="Sokoban maker" />
+
+  <Card title="Sokoban Level Maker" href="/sokoban/maker" icon="pencil" image={{ src: "/assets/sokoban/sokoban-maker.png", alt: "sokoban", title: "Sokoban maker" }}>
     <p>
       Create your own Sokoban levels with this interactive level maker.
       Design custom puzzles by placing walls, boxes, targets, and more.

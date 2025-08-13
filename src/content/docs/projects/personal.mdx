@@ -9,7 +9,7 @@ import Card from '../../../components/card.astro';
 import TechStack from '../../../components/tech-stack.astro';
 
 <CardGrid>
-	<Card target title="Chinese Dico" href="https://chinese-dico.vercel.app">
+	<Card target title="Chinese Dico" href="https://chinese-dico.vercel.app" image={{ src: '/assets/images/chinese-dico.png', alt: 'Chinese Dico', title: 'Chinese Dico' }}>
 		<p>A Chinese - French dictionary</p>
 		<TechStack stacks={["Next.js"]} />
 	</Card>
@@ -17,6 +17,7 @@ import TechStack from '../../../components/tech-stack.astro';
 		target
 		title="Light tiles off"
 		href="https://light-tiles-off.vercel.app"
+    image={{ src: '/assets/images/light-tiles-off.png', alt: 'Light Tiles Off', title: 'Light Tiles Off' }}
 	>
 		<p>Just a game, have fun!</p>
 		<TechStack stacks={["Next.js"]} />
