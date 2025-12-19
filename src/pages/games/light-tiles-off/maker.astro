@@ -1,0 +1,256 @@
+---
+import Layout from "../../../layouts/SokobanLayout.astro";
+---
+
+<Layout title="Level Maker" description="Create levels for Light Tiles Off">
+  <div class="maker-wrapper">
+    <div class="nav-links">
+      <a href="/games" class="btn-link">Back to Games</a>
+      <a href="/games/light-tiles-off" class="btn-link">Play Light Tiles Off</a>
+    </div>
+    <h1>Level Maker</h1>
+    
+    <div class="controls">
+      <button data-clear-btn>Clear Grid</button>
+      <button data-export-btn>Export to Console</button>
+    </div>
+
+    <canvas data-maker-canvas width="270" height="270"></canvas>
+    
+    <div class="output-container">
+        <label for="output">Level JSON:</label>
+        <textarea id="output" rows="10" cols="30" readonly></textarea>
+    </div>
+  </div>
+</Layout>
+
+<style is:global>
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #f8fafc;
+  }
+</style>
+
+<style>
+  .maker-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 1.5rem;
+    background-color: #f8fafc; /* slate-50 */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #334155; /* slate-700 */
+  }
+  .nav-links {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .btn-link {
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    border: 1px solid #cbd5e1;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+    color: #64748b;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+  }
+  .btn-link:hover { 
+    background-color: #fff; 
+    color: #0f172a;
+    border-color: #94a3b8;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  h1 { 
+    font-size: 2rem; 
+    line-height: 2.5rem; 
+    margin-bottom: 0.5rem; 
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.025em;
+  }
+  
+  .controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  button {
+    padding: 0.5rem 1.25rem;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #475569;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  button:hover { 
+    background-color: #f8fafc; 
+    color: #0f172a;
+    border-color: #cbd5e1;
+  }
+  
+  canvas {
+    background-color: white;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 10px;
+  }
+  
+  .output-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  label {
+    font-weight: 600;
+    font-size: 0.875rem;
+  }
+  
+  textarea {
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid #cbd5e1;
+    font-family: monospace;
+    width: 100%;
+    resize: vertical;
+    background-color: white;
+    color: #334155;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  textarea:focus {
+    outline: none;
+    border-color: #94a3b8;
+    box-shadow: 0 0 0 2px rgba(148, 163, 184, 0.2);
+  }
+</style>
+
+<script>
+  let tiles = Array(5).fill(0).map(() => Array(5).fill(0));
+  
+  // Canvas config
+  const TILE_SIZE = 50;
+  const GAP = 5;
+  const CANVAS_SIZE = (TILE_SIZE * 5) + (GAP * 4); 
+
+  let canvas: HTMLCanvasElement | null;
+  let ctx: CanvasRenderingContext2D | null;
+  let outputEl: HTMLTextAreaElement | null;
+  let clearBtn: HTMLElement | null;
+  let exportBtn: HTMLElement | null;
+
+  function initMaker() {
+    canvas = document.querySelector('[data-maker-canvas]') as HTMLCanvasElement;
+    outputEl = document.getElementById('output') as HTMLTextAreaElement;
+    clearBtn = document.querySelector('[data-clear-btn]');
+    exportBtn = document.querySelector('[data-export-btn]');
+
+    if (!canvas) return;
+    
+    canvas.width = CANVAS_SIZE;
+    canvas.height = CANVAS_SIZE;
+    ctx = canvas.getContext('2d');
+    
+    setupListeners();
+    render();
+  }
+
+  function render() {
+    if (!ctx) return;
+    
+    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    
+    tiles.forEach((row, rIndex) => {
+      row.forEach((val, cIndex) => {
+        const x = cIndex * (TILE_SIZE + GAP);
+        const y = rIndex * (TILE_SIZE + GAP);
+        
+        const radius = 8;
+        ctx!.beginPath();
+        ctx!.roundRect(x, y, TILE_SIZE, TILE_SIZE, radius);
+        
+        if (val === 1) {
+            ctx!.fillStyle = '#334155'; // slate-700
+            ctx!.fill();
+        } else {
+            ctx!.fillStyle = '#f1f5f9'; // slate-100
+            ctx!.fill();
+        }
+      });
+    });
+  }
+
+  function handleCanvasClick(e: MouseEvent) {
+    if (!canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const col = Math.floor(x / (TILE_SIZE + GAP));
+    const row = Math.floor(y / (TILE_SIZE + GAP));
+
+    if (row >= 0 && row < 5 && col >= 0 && col < 5) {
+        const tileX = col * (TILE_SIZE + GAP);
+        const tileY = row * (TILE_SIZE + GAP);
+        if (x >= tileX && x <= tileX + TILE_SIZE && y >= tileY && y <= tileY + TILE_SIZE) {
+            toggle(row, col);
+            if (row > 0) toggle(row - 1, col);
+            if (row < 4) toggle(row + 1, col);
+            if (col > 0) toggle(row, col - 1);
+            if (col < 4) toggle(row, col + 1);
+            render();
+        }
+    }
+  }
+
+  function toggle(r: number, c: number) {
+    tiles[r][c] = tiles[r][c] ? 0 : 1;
+  }
+
+  function setupListeners() {
+    if (canvas) {
+        canvas.onclick = handleCanvasClick;
+    }
+
+    if (clearBtn) {
+        clearBtn.onclick = () => {
+            tiles = Array(5).fill(0).map(() => Array(5).fill(0));
+            render();
+            if (outputEl) outputEl.value = '';
+        };
+    }
+
+    if (exportBtn) {
+        exportBtn.onclick = () => {
+            const rows = tiles.map(row => `  [${row.join(', ')}]`);
+            const formatted = `[\n${rows.join(',\n')},\n]`;
+            console.log(formatted);
+            if (outputEl) outputEl.value = formatted;
+        };
+    }
+  }
+
+  initMaker();
+  document.addEventListener('astro:page-load', initMaker);
+</script>

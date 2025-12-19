@@ -1,0 +1,361 @@
+---
+import Layout from "../../../layouts/SokobanLayout.astro";
+import { levels } from "./levels";
+---
+
+<Layout title="Light Tiles Off" description="Turn off all the lights to win!">
+  <div class="game-wrapper">
+    <div class="nav-links">
+      <a href="/games" class="btn-link">Back to Games</a>
+      <a href="/games/light-tiles-off/maker" class="btn-link">Level Maker</a>
+    </div>
+    <h1>Light tiles off (or on)</h1>
+    
+    <div class="controls-top">
+      <h2 data-level-display>Level: 1/--</h2>
+      <button data-reset-btn>Reset</button>
+    </div>
+
+    <div class="controls-mid">
+      <button data-prev-btn>Previous</button>
+      <span>Tries: <span data-tries-display>0</span></span>
+      <button data-next-btn>Next</button>
+    </div>
+
+    <canvas data-game-canvas width="270" height="270"></canvas>
+
+    <div data-win-message class="message hidden">
+      <span>You solved it</span>
+      <button data-next-level-btn>Go to next level</button>
+    </div>
+
+    <div data-end-message class="message hidden">
+      <span>You've done all the puzzles, congratulations!</span>
+      <button data-restart-btn>Restart</button>
+    </div>
+    
+    <footer>
+        By <a href="https://github.com/TheMysteryz" target="_blank">TheMysteryz</a>
+    </footer>
+  </div>
+</Layout>
+
+<style is:global>
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #f8fafc;
+  }
+</style>  
+
+<style>
+  .game-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 1.5rem;
+    background-color: #f8fafc; /* slate-50 */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #334155; /* slate-700 */
+  }
+  .nav-links {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .btn-link {
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    border: 1px solid #cbd5e1;
+    border-radius: 9999px;
+    cursor: pointer;
+    font-weight: 500;
+    text-decoration: none;
+    color: #64748b;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+  }
+  .btn-link:hover { 
+    background-color: #fff; 
+    color: #0f172a;
+    border-color: #94a3b8;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+
+  h1 { 
+    font-size: 2rem; 
+    line-height: 2.5rem; 
+    margin-bottom: 0.5rem; 
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.025em;
+  }
+  
+  .controls-top, .controls-mid {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 320px;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  
+  button {
+    padding: 0.5rem 1.25rem;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #475569;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  button:hover { 
+    background-color: #f8fafc; 
+    color: #0f172a;
+    border-color: #cbd5e1;
+  }
+  button:disabled { 
+    opacity: 0.5; 
+    pointer-events: none; 
+    box-shadow: none;
+  }
+  
+  canvas {
+    background-color: white;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 10px; /* Add padding inside the canvas container visual */
+  }
+
+  .message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 600;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    min-width: 280px;
+  }
+  .hidden { display: none; }
+  
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 1rem;
+    font-size: 0.875rem;
+    color: #94a3b8;
+  }
+  a { color: #64748b; font-weight: 600; text-decoration: none; transition: color 0.2s; }
+  a:hover { color: #0f172a; }
+</style>
+
+<script>
+  import { levels } from "./levels";
+
+  let currentLevel = 0;
+  let tiles: number[][] = [];
+  let tries = 0;
+  let isWin = false;
+  let isEnd = false;
+
+  // Canvas config
+  const TILE_SIZE = 50;
+  const GAP = 5;
+  // 5 tiles * 50px + 4 gaps * 5px = 250 + 20 = 270px
+  const CANVAS_SIZE = (TILE_SIZE * 5) + (GAP * 4); 
+
+  let canvas: HTMLCanvasElement | null;
+  let ctx: CanvasRenderingContext2D | null;
+  let levelDisplay: HTMLElement | null;
+  let triesDisplay: HTMLElement | null;
+  let prevBtn: HTMLButtonElement | null;
+  let nextBtn: HTMLButtonElement | null;
+  let resetBtn: HTMLElement | null;
+  let winMessage: HTMLElement | null;
+  let nextLevelBtn: HTMLElement | null;
+  let endMessage: HTMLElement | null;
+  let restartBtn: HTMLElement | null;
+
+  function initGame() {
+    canvas = document.querySelector('[data-game-canvas]') as HTMLCanvasElement;
+    levelDisplay = document.querySelector('[data-level-display]');
+    triesDisplay = document.querySelector('[data-tries-display]');
+    prevBtn = document.querySelector('[data-prev-btn]') as HTMLButtonElement;
+    nextBtn = document.querySelector('[data-next-btn]') as HTMLButtonElement;
+    resetBtn = document.querySelector('[data-reset-btn]');
+    winMessage = document.querySelector('[data-win-message]');
+    nextLevelBtn = document.querySelector('[data-next-level-btn]');
+    endMessage = document.querySelector('[data-end-message]');
+    restartBtn = document.querySelector('[data-restart-btn]');
+
+    if (!canvas) return;
+    
+    // Set canvas size explicitly
+    canvas.width = CANVAS_SIZE;
+    canvas.height = CANVAS_SIZE;
+    ctx = canvas.getContext('2d');
+
+    loadLevel(currentLevel);
+    setupListeners();
+  }
+
+  function loadLevel(lvlIndex: number) {
+    currentLevel = lvlIndex;
+    // Deep copy level
+    tiles = levels[currentLevel].map(row => [...row]);
+    tries = 0;
+    isWin = false;
+    isEnd = false;
+    render();
+  }
+
+  function render() {
+    if (!ctx || !levelDisplay || !triesDisplay || !prevBtn || !nextBtn || !winMessage || !endMessage) return;
+
+    // Update UI
+    levelDisplay.textContent = `Level: ${currentLevel + 1}/${levels.length}`;
+    triesDisplay.textContent = tries.toString();
+    
+    prevBtn.disabled = currentLevel === 0;
+    nextBtn.disabled = currentLevel === levels.length - 1;
+    
+    if (currentLevel === 0) prevBtn.style.opacity = '0';
+    else prevBtn.style.opacity = '1';
+    
+    if (currentLevel === levels.length - 1) nextBtn.style.opacity = '0';
+    else nextBtn.style.opacity = '1';
+
+    // Render Canvas
+    // Clear with white background for the "card" effect inside canvas if needed, 
+    // but we are drawing full tiles.
+    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    
+    tiles.forEach((row, rIndex) => {
+      row.forEach((val, cIndex) => {
+        const x = cIndex * (TILE_SIZE + GAP);
+        const y = rIndex * (TILE_SIZE + GAP);
+        
+        // Draw tile
+        // Modern colors: 
+        // On (1) = Slate 800 (Dark) or maybe a nice accent color? Let's go with a soft dark blue/slate.
+        // Off (0) = Slate 100 (Light)
+        
+        // Rounded rect function
+        const radius = 8;
+        ctx!.beginPath();
+        ctx!.roundRect(x, y, TILE_SIZE, TILE_SIZE, radius);
+        
+        if (val === 1) {
+            // ON state - Dark/Active
+            ctx!.fillStyle = '#334155'; // slate-700
+            ctx!.fill();
+            
+            // Add a subtle inner shadow or highlight?
+            // Let's keep it flat and clean for now.
+        } else {
+            // OFF state - Light/Inactive
+            ctx!.fillStyle = '#f1f5f9'; // slate-100
+            ctx!.fill();
+        }
+      });
+    });
+
+    // Win/End states
+    winMessage.classList.toggle('hidden', !isWin);
+    endMessage.classList.toggle('hidden', !isEnd);
+  }
+
+  function handleCanvasClick(e: MouseEvent) {
+    if (isWin || isEnd || !canvas) return;
+
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const col = Math.floor(x / (TILE_SIZE + GAP));
+    const row = Math.floor(y / (TILE_SIZE + GAP));
+
+    // Check bounds
+    if (row >= 0 && row < 5 && col >= 0 && col < 5) {
+        // Check if click was in the gap
+        const tileX = col * (TILE_SIZE + GAP);
+        const tileY = row * (TILE_SIZE + GAP);
+        if (x >= tileX && x <= tileX + TILE_SIZE && y >= tileY && y <= tileY + TILE_SIZE) {
+            handleClick(row, col);
+        }
+    }
+  }
+
+  function handleClick(r: number, c: number) {
+    toggle(r, c);
+    if (r > 0) toggle(r - 1, c);
+    if (r < tiles.length - 1) toggle(r + 1, c);
+    if (c > 0) toggle(r, c - 1);
+    if (c < tiles[0].length - 1) toggle(r, c + 1);
+
+    tries++;
+    checkWin();
+    render();
+  }
+
+  function toggle(r: number, c: number) {
+    tiles[r][c] = tiles[r][c] ? 0 : 1;
+  }
+
+  function checkWin() {
+    const allOff = tiles.every(row => row.every(val => val === 0));
+    if (allOff) {
+      if (currentLevel + 1 >= levels.length) {
+        isEnd = true;
+      } else {
+        isWin = true;
+      }
+    }
+  }
+
+  function setupListeners() {
+    if (resetBtn) resetBtn.onclick = () => loadLevel(currentLevel);
+    
+    if (prevBtn) prevBtn.onclick = () => {
+      if (currentLevel > 0) loadLevel(currentLevel - 1);
+    };
+    
+    if (nextBtn) nextBtn.onclick = () => {
+      if (currentLevel < levels.length - 1) loadLevel(currentLevel + 1);
+    };
+
+    if (nextLevelBtn) nextLevelBtn.onclick = () => {
+      if (currentLevel < levels.length - 1) loadLevel(currentLevel + 1);
+    };
+
+    if (restartBtn) restartBtn.onclick = () => {
+      loadLevel(0);
+    };
+
+    if (canvas) {
+        canvas.onclick = handleCanvasClick;
+    }
+  }
+
+  initGame();
+  document.addEventListener('astro:page-load', initGame);
+</script>
