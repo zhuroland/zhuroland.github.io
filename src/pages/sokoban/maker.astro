@@ -197,6 +197,13 @@ import Button from "../../components/button.astro";
     font-weight: 600;
   }
 
+  .block-button:disabled,
+  .block-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
   .combined-image {
     position: relative;
     width: 40px;
@@ -467,6 +474,11 @@ import Button from "../../components/button.astro";
     private lastPaintedY: number = -1;
 
     private selectBlockType(type: CellType): void {
+      // Block selection during play mode
+      if (this.isPlayMode) {
+        return;
+      }
+      
       this.selectedBlockType = type;
 
       // Update UI to reflect the selection
@@ -625,6 +637,11 @@ import Button from "../../components/button.astro";
     }
 
     private startPainting(): void {
+      // Block painting during play mode
+      if (this.isPlayMode) {
+        return;
+      }
+      
       this.isPainting = true;
       this.lastPaintedX = -1;
       this.lastPaintedY = -1;
@@ -684,6 +701,11 @@ import Button from "../../components/button.astro";
     }
 
     private handleCellClick(x: number, y: number): void {
+      // Block editing during play mode
+      if (this.isPlayMode) {
+        return;
+      }
+      
       // Skip if trying to paint same cell twice in a row during painting
       if (
         this.isPainting &&
@@ -1176,8 +1198,10 @@ import Button from "../../components/button.astro";
       (document.getElementById("reset-play-test") as HTMLButtonElement).style.display =
         "block";
       this.validationMessageElement.textContent =
-        "Play mode: Use arrow keys or WASD to move. Push all boxes onto targets.";
+        "Play mode: Use arrow keys or WASD to move. Push all boxes onto targets. (Editing disabled)";
       this.validationMessageElement.className = "validation-message";
+      // Disable edit controls
+      this.toggleEditControls(true);
       // Add key listener for movement (reuse existing keydown by enhancing it)
       document.addEventListener("keydown", this.playKeyHandler);
     }
@@ -1189,6 +1213,8 @@ import Button from "../../components/button.astro";
       (document.getElementById("reset-play-test") as HTMLButtonElement).style.display =
         "none";
       document.removeEventListener("keydown", this.playKeyHandler);
+      // Re-enable edit controls
+      this.toggleEditControls(false);
       // restore snapshot
       if (this.playModeSnapshot) {
         for (let y = 0; y < this.gridHeight; y++) {
@@ -1202,7 +1228,7 @@ import Button from "../../components/button.astro";
           ? { ...this.playModePlayerStart }
           : null;
       }
-      this.validationMessageElement.textContent = "Exited play mode.";
+      this.validationMessageElement.textContent = "Exited play mode. Editing enabled.";
       this.validationMessageElement.className = "validation-message";
     }
 
@@ -1316,6 +1342,46 @@ import Button from "../../components/button.astro";
       this.validationMessageElement.textContent =
         "Solved! All targets are covered. You can export or continue editing.";
       this.validationMessageElement.className = "validation-message success";
+    }
+
+    private toggleEditControls(disable: boolean): void {
+      // Disable/enable block selector buttons
+      document.querySelectorAll(".block-button").forEach((button) => {
+        (button as HTMLButtonElement).disabled = disable;
+        if (disable) {
+          button.classList.add("disabled");
+        } else {
+          button.classList.remove("disabled");
+        }
+      });
+      
+      // Disable/enable grid control inputs and buttons
+      const gridWidth = document.getElementById("grid-width") as HTMLInputElement;
+      const gridHeight = document.getElementById("grid-height") as HTMLInputElement;
+      const resizeBtn = document.getElementById("resize-grid") as HTMLButtonElement;
+      const clearBtn = document.getElementById("clear-grid") as HTMLButtonElement;
+      const fillWallsBtn = document.getElementById("fill-walls") as HTMLButtonElement;
+      const exportBtn = document.getElementById("export-level") as HTMLButtonElement;
+      const importBtn = document.getElementById("import-level-button") as HTMLButtonElement;
+      const importArea = document.getElementById("import-code-area") as HTMLTextAreaElement;
+      
+      if (gridWidth) gridWidth.disabled = disable;
+      if (gridHeight) gridHeight.disabled = disable;
+      if (resizeBtn) resizeBtn.disabled = disable;
+      if (clearBtn) clearBtn.disabled = disable;
+      if (fillWallsBtn) fillWallsBtn.disabled = disable;
+      if (exportBtn) exportBtn.disabled = disable;
+      if (importBtn) importBtn.disabled = disable;
+      if (importArea) importArea.disabled = disable;
+      
+      // Add visual style for disabled grid cells
+      document.querySelectorAll(".grid-cell").forEach((cell) => {
+        if (disable) {
+          (cell as HTMLElement).style.cursor = "not-allowed";
+        } else {
+          (cell as HTMLElement).style.cursor = "pointer";
+        }
+      });
     }
   }
 
