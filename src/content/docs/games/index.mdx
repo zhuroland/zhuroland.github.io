@@ -10,7 +10,7 @@ import TechStack from '../../../components/tech-stack.astro';
 This is a list of games I've made or worked on.
 
 <CardGrid>
-  <Card title="Sokoban" href="/sokoban" icon="puzzle" image={{ src: "/assets/sokoban/sokoban-game.png", alt: "sokoban", title: "Sokoban game" }}>
+  <Card title="Sokoban" href="/games/sokoban" icon="puzzle" image={{ src: "/assets/sokoban/sokoban-game.png", alt: "sokoban", title: "Sokoban game" }}>
     <p>
       A puzzle game where the player pushes boxes around a grid to
       reach the target positions.
@@ -18,7 +18,7 @@ This is a list of games I've made or worked on.
     <TechStack stacks={["HTML", "CSS", "JavaScript"]} />
   </Card>
 
-  <Card title="Sokoban Level Maker" href="/sokoban/maker" icon="pencil" image={{ src: "/assets/sokoban/sokoban-maker.png", alt: "sokoban", title: "Sokoban maker" }}>
+  <Card title="Sokoban Level Maker" href="/games/sokoban/maker" icon="pencil" image={{ src: "/assets/sokoban/sokoban-maker.png", alt: "sokoban", title: "Sokoban maker" }}>
     <p>
       Create your own Sokoban levels with this interactive level maker.
       Design custom puzzles by placing walls, boxes, targets, and more.
@@ -34,3 +34,12 @@ This is a list of games I've made or worked on.
 > And others are **made by me**.
 
 If you have any questions or you want to share your level, feel free to [contact me](/contact).
+
+<CardGrid>
+  <Card title="Light Tiles Off" href="/games/light-tiles-off" icon="puzzle" image={{ src: "/assets/light-tiles-off/light-tiles-off-game.png", alt: "light tiles off", title: "Light Tiles Off game" }}>
+    <p>
+      A game where the player toggles tiles to turn off all the lights on the grid.
+    </p>
+    <TechStack stacks={["HTML", "CSS", "JavaScript"]} />
+  </Card>
+</CardGrid>

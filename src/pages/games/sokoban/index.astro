@@ -1,13 +1,13 @@
 ---
-import Layout from "../../layouts/SokobanLayout.astro";
-import Button from "../../components/button.astro";
+import Layout from "../../../layouts/SokobanLayout.astro";
+import Button from "../../../components/button.astro";
 ---
 
 <Layout title="Sokoban Game" description="Play Sokoban, a classic puzzle game where you push boxes to their targets.">
   <div class="navigation">
     <h1>Sokoban Game</h1>
     <Button href="/games">Go back</Button>
-    <Button href="/sokoban/maker">Level Maker</Button>
+    <Button href="/games/sokoban/maker">Level Maker</Button>
   </div>
 
   <div class="game-container">
@@ -56,7 +56,7 @@ import Button from "../../components/button.astro";
 
 <script>
   // getting the canvas and context
-  import { getCanvasContext } from "../../utils/canvas";
+  import { getCanvasContext } from "../../../utils/canvas";
   // getting the levels
   import { levels } from "./levels";
   // ========================
