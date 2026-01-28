@@ -13,13 +13,13 @@ import { levels } from "./levels";
     
     <div class="controls-top">
       <h2 data-level-display>Level: 1/--</h2>
-      <button data-reset-btn>Reset</button>
+      <button data-reset-btn>Reset level</button>
     </div>
 
     <div class="controls-mid">
-      <button data-prev-btn>Previous</button>
+      <button data-prev-btn>← Previous lvl</button>
       <span>Tries: <span data-tries-display>0</span></span>
-      <button data-next-btn>Next</button>
+      <button data-next-btn>Next lvl →</button>
     </div>
 
     <canvas data-game-canvas width="270" height="270"></canvas>
@@ -48,7 +48,7 @@ import { levels } from "./levels";
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background-color: #f8fafc;
+    background-color: oklch(98% 0.005 250);
   }
 </style>  
 
@@ -60,9 +60,9 @@ import { levels } from "./levels";
     justify-content: center;
     min-height: 100vh;
     gap: 1.5rem;
-    background-color: #f8fafc; /* slate-50 */
+    background-color: oklch(98% 0.005 250); /* slate-50 */
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    color: #334155; /* slate-700 */
+    color: oklch(32% 0.02 250); /* slate-700 */
   }
   .nav-links {
     display: flex;
@@ -71,20 +71,21 @@ import { levels } from "./levels";
   }
   .btn-link {
     padding: 0.5rem 1rem;
-    background-color: transparent;
-    border: 1px solid #cbd5e1;
+    background-color: oklch(100% 0 0 / 0.5);
+    border: 1px solid oklch(86% 0.01 250 / 0.5);
     border-radius: 9999px;
     cursor: pointer;
     font-weight: 500;
     text-decoration: none;
-    color: #64748b;
+    color: oklch(53% 0.02 250);
     font-size: 0.875rem;
     transition: all 0.2s;
+    backdrop-filter: blur(8px);
   }
   .btn-link:hover { 
-    background-color: #fff; 
-    color: #0f172a;
-    border-color: #94a3b8;
+    background-color: oklch(100% 0 0 / 0.8); 
+    color: oklch(15% 0.02 250);
+    border-color: oklch(69% 0.02 250 / 0.7);
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   }
 
@@ -93,7 +94,7 @@ import { levels } from "./levels";
     line-height: 2.5rem; 
     margin-bottom: 0.5rem; 
     font-weight: 700;
-    color: #0f172a;
+    color: oklch(15% 0.02 250);
     letter-spacing: -0.025em;
   }
   
@@ -108,19 +109,20 @@ import { levels } from "./levels";
   
   button {
     padding: 0.5rem 1.25rem;
-    background-color: white;
-    border: 1px solid #e2e8f0;
+    background-color: oklch(100% 0 0 / 0.7);
+    border: 1px solid oklch(92% 0.01 250 / 0.6);
     border-radius: 0.5rem;
     cursor: pointer;
     font-weight: 600;
-    color: #475569;
+    color: oklch(42% 0.02 250);
     transition: all 0.2s;
     box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    backdrop-filter: blur(8px);
   }
   button:hover { 
-    background-color: #f8fafc; 
-    color: #0f172a;
-    border-color: #cbd5e1;
+    background-color: oklch(98% 0.005 250 / 0.9); 
+    color: oklch(15% 0.02 250);
+    border-color: oklch(86% 0.01 250 / 0.8);
   }
   button:disabled { 
     opacity: 0.5; 
@@ -128,13 +130,25 @@ import { levels } from "./levels";
     box-shadow: none;
   }
   
+  button[data-reset-btn] {
+    background-color: oklch(55% 0.22 25 / 0.65);
+    color: oklch(100% 0 0);
+    border-color: oklch(55% 0.22 25 / 0.65);
+  }
+  button[data-reset-btn]:hover {
+    background-color: oklch(48% 0.21 25 / 0.75);
+    border-color: oklch(48% 0.21 25 / 0.75);
+  }
+  
   canvas {
-    background-color: white;
+    background-color: oklch(100% 0 0 / 0.6);
     cursor: pointer;
     margin-bottom: 1.5rem;
     border-radius: 1rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    padding: 10px; /* Add padding inside the canvas container visual */
+    padding: 10px;
+    backdrop-filter: blur(12px);
+    border: 1px solid oklch(100% 0 0 / 0.3);
   }
 
   .message {
@@ -143,7 +157,7 @@ import { levels } from "./levels";
     align-items: center;
     gap: 1rem;
     font-weight: 600;
-    background: white;
+    background: oklch(100% 0 0 / 0.85);
     padding: 1.5rem;
     border-radius: 1rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -153,6 +167,8 @@ import { levels } from "./levels";
     transform: translate(-50%, -50%);
     z-index: 10;
     min-width: 280px;
+    backdrop-filter: blur(16px);
+    border: 1px solid oklch(100% 0 0 / 0.4);
   }
   .hidden { display: none; }
   
@@ -162,10 +178,10 @@ import { levels } from "./levels";
     left: 0;
     padding: 1rem;
     font-size: 0.875rem;
-    color: #94a3b8;
+    color: oklch(69% 0.02 250);
   }
-  a { color: #64748b; font-weight: 600; text-decoration: none; transition: color 0.2s; }
-  a:hover { color: #0f172a; }
+  a { color: oklch(53% 0.02 250); font-weight: 600; text-decoration: none; transition: color 0.2s; }
+  a:hover { color: oklch(15% 0.02 250); }
 </style>
 
 <script>
@@ -266,14 +282,14 @@ import { levels } from "./levels";
         
         if (val === 1) {
             // ON state - Dark/Active
-            ctx!.fillStyle = '#334155'; // slate-700
+            ctx!.fillStyle = 'oklch(32% 0.02 250)'; // slate-700
             ctx!.fill();
             
             // Add a subtle inner shadow or highlight?
             // Let's keep it flat and clean for now.
         } else {
             // OFF state - Light/Inactive
-            ctx!.fillStyle = '#f1f5f9'; // slate-100
+            ctx!.fillStyle = 'oklch(96% 0.005 250)'; // slate-100
             ctx!.fill();
         }
       });
