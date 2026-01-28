@@ -3,7 +3,10 @@ import Layout from "../../../layouts/SokobanLayout.astro";
 import Button from "../../../components/button.astro";
 ---
 
-<Layout title="Sokoban Game" description="Play Sokoban, a classic puzzle game where you push boxes to their targets.">
+<Layout
+  title="Sokoban Game"
+  description="Play Sokoban, a classic puzzle game where you push boxes to their targets."
+>
   <div class="navigation">
     <h1>Sokoban Game</h1>
     <Button href="/games">Go back</Button>
@@ -11,12 +14,12 @@ import Button from "../../../components/button.astro";
   </div>
 
   <div class="game-container">
-    <canvas data-canvas-game width="800" height="600"></canvas>
     <div class="controls">
+      <button data-canvas-prev>← Previous Level</button>
       <button data-canvas-restart>Restart Level</button>
-      <button data-canvas-prev>Previous Level</button>
-      <button data-canvas-next>Next Level</button>
+      <button data-canvas-next>Next Level →</button>
     </div>
+    <canvas data-canvas-game width="800" height="600"></canvas>
   </div>
 </Layout>
 
@@ -37,20 +40,25 @@ import Button from "../../../components/button.astro";
 
   .controls {
     display: flex;
+    justify-content: center;
     gap: 1rem;
   }
 
   button {
+    --btn-lightness: 40%;
     padding: 0.5rem 1rem;
-    background: #4a5568;
-    color: white;
     border: none;
     border-radius: 0.25rem;
     cursor: pointer;
+    background: oklch(var(--btn-lightness) 0.05 260);
+    color: oklch(90% 0 0);
+  }
+  button:hover {
+    --btn-lightness: 50%;
   }
 
-  button:hover {
-    background: #2d3748;
+  button[data-canvas-restart] {
+    background: oklch(var(--btn-lightness) 0.1 30);
   }
 </style>
 
