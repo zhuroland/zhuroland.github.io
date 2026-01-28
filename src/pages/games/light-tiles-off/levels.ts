@@ -1,3 +1,4 @@
+// lvl: number[][][]
 export const levels = [
   // lvl: 0
   [
