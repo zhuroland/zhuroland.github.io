@@ -129,13 +129,25 @@ export const levels: Level[] = [
     ],
   },
   {
+    map: ["  WWWWWW", "WWWTTTTW", "WPBBBBWW", "W     W ", "WWWWWWW "],
+  },
+  {
     map: [
-      "  WWWWWW",
-      "WWWTTTTW",
-      "WPBBBBWW",
-      "W     W ",
-      "WWWWWWW "
-    ]
+      "WWWW  ",
+      "W  W  ",
+      "W  W  ",
+      "W PW  ",
+      "WWBW  ",
+      "W  W  ",
+      "W  W  ",
+      "W  W  ",
+      "WW W  ",
+      "W  WWW",
+      "W  TTW",
+      "WWBW W",
+      " W   W",
+      " WWWWW",
+    ],
   },
   {
     map: [
