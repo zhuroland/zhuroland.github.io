@@ -1,5 +1,12 @@
 ---
-import conf from '../../config.json';
+interface Props {
+  conf: {
+    infos: {
+      author: string
+    }
+  }
+}
+const { conf } = Astro.props;
 ---
 
 <footer>
