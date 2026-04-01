@@ -460,6 +460,13 @@ import Button from "../../../components/button.astro";
     const deltaY = event.clientY - swipeStartY;
     activePointerId = null;
 
+    if (gameComplete) {
+      if (currentLevel < levels.length - 1) {
+        nextLevel();
+      }
+      return;
+    }
+
     if (Math.abs(deltaX) < SWIPE_THRESHOLD && Math.abs(deltaY) < SWIPE_THRESHOLD) {
       return;
     }
@@ -684,8 +691,8 @@ import Button from "../../../components/button.astro";
         );
         ctx.font = "20px Arial";
         ctx.fillText(
-          "Press Space for next level",
-          canvas.width / 2 - 110,
+          "Tap screen or press Space",
+          canvas.width / 2 - 120,
           canvas.height / 2 + 20
         );
       } else {
