@@ -7,69 +7,230 @@ import Button from "../../../components/button.astro";
   title="Sokoban Game"
   description="Play Sokoban, a classic puzzle game where you push boxes to their targets."
 >
-  <div class="navigation">
-    <h1>Sokoban Game</h1>
-    <Button href="/games">Go back</Button>
-    <Button href="/games/sokoban/maker">Level Maker</Button>
-  </div>
+  <div class="page-shell">
+    <header class="navigation">
+      <div class="title-block">
+        <h1>Sokoban Game</h1>
+        <p>Push every box onto a target. Swipe on the board or use arrow keys to move.</p>
+      </div>
+      <div class="navigation-actions">
+        <Button href="/games" class="compact-button">Go back</Button>
+        <Button href="/games/sokoban/maker" class="compact-button">Level Maker</Button>
+      </div>
+    </header>
 
-  <div class="game-container">
-    <div class="controls">
-      <button data-canvas-prev>← Previous Level</button>
-      <button data-canvas-restart>Restart Level</button>
-      <button data-canvas-next>Next Level →</button>
-    </div>
-    <canvas data-canvas-game width="800" height="600"></canvas>
+    <main class="game-container">
+      <div class="controls" aria-label="Level controls">
+        <button type="button" data-canvas-prev>← Previous Level</button>
+        <button type="button" data-canvas-restart>Restart Level</button>
+        <button type="button" data-canvas-next>Next Level →</button>
+      </div>
+
+      <div class="canvas-shell">
+        <canvas data-canvas-game width="800" height="600"></canvas>
+      </div>
+    </main>
   </div>
 </Layout>
 
 <style>
+  :global(body) {
+    margin: 0;
+    min-height: 100vh;
+    background:
+      radial-gradient(circle at top, rgba(128, 167, 255, 0.18), transparent 35%),
+      linear-gradient(180deg, #f7f9fc 0%, #eef3ff 100%);
+    color: #1f2937;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .page-shell {
+    min-height: 100vh;
+    padding: clamp(1rem, 2vw, 2rem);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
   .navigation {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     gap: 1rem;
-    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .title-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .title-block h1 {
+    margin: 0;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  .title-block p {
+    margin: 0;
+    max-width: 52ch;
+    color: #516074;
+  }
+
+  .navigation-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    width: min(100%, 320px);
+  }
+
+  .navigation-actions :global(div) {
+    padding: 0;
+    box-shadow: none;
+    border-radius: 999px;
+    background: none;
+  }
+
+  .navigation-actions :global(a),
+  .navigation-actions :global(button) {
+    padding: 0.55rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    opacity: 1;
+    background-color: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(15, 23, 42, 0.08);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   }
 
   .game-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 1rem;
+    align-items: center;
+    width: 100%;
   }
 
   .controls {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 40rem;
   }
 
   button {
     --btn-lightness: 40%;
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0.8rem;
     border: none;
-    border-radius: 0.25rem;
+    border-radius: 0.85rem;
     cursor: pointer;
     background: oklch(var(--btn-lightness) 0.05 260);
     color: oklch(90% 0 0);
+    font-weight: 600;
+    font-size: 0.92rem;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.08);
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      background 0.15s ease;
+    touch-action: manipulation;
   }
+
   button:hover {
     --btn-lightness: 50%;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.1);
   }
 
   button[data-canvas-restart] {
     background: oklch(var(--btn-lightness) 0.1 30);
   }
+
+  .canvas-shell {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 0.25rem;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    max-width: none;
+    border-radius: 1.25rem;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.16);
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    cursor: grab;
+  }
+
+  button:focus-visible {
+    outline: 2px solid oklch(68% 0.12 255);
+    outline-offset: 2px;
+  }
+
+  @media (max-width: 720px) {
+    .page-shell {
+      padding: 0.75rem;
+    }
+
+    .navigation-actions {
+      grid-template-columns: 1fr;
+      width: 100%;
+    }
+
+    .controls {
+      width: 100%;
+    }
+
+    .controls button {
+      width: 100%;
+      min-width: 0;
+      padding-inline: 0.4rem;
+      font-size: 0.8rem;
+    }
+
+    .navigation-actions :global(a),
+    .navigation-actions :global(button) {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 360px) {
+    .page-shell {
+      padding: 0.5rem;
+    }
+
+    .title-block h1 {
+      font-size: 1.8rem;
+    }
+
+    .title-block p {
+      font-size: 0.92rem;
+    }
+
+    .controls {
+      gap: 0.35rem;
+    }
+
+    .navigation-actions :global(a),
+    .navigation-actions :global(button) {
+      padding: 0.45rem 0.6rem;
+      font-size: 0.82rem;
+    }
+  }
 </style>
 
 <script>
-  // getting the canvas and context
   import { getCanvasContext } from "../../../utils/canvas";
-  // getting the levels
   import { levels } from "./levels";
-  // ========================
-  // Type definitions
-  // ========================
+
   interface Position {
     x: number;
     y: number;
@@ -77,15 +238,11 @@ import Button from "../../../components/button.astro";
 
   type CellType = "wall" | "floor" | "target";
 
-  // ========================
-  // Game configuration
-  // ========================
   const { canvas, ctx } = getCanvasContext();
-  const TILE_SIZE = 50;
+  const MAX_TILE_SIZE = 50;
+  const MIN_TILE_SIZE = 10;
+  const CANVAS_PADDING = 24;
 
-  // ========================
-  // Game state
-  // ========================
   let playerPos: Position = { x: 0, y: 0 };
   let gameMap: CellType[][] = [];
   let boxes: Position[] = [];
@@ -94,10 +251,12 @@ import Button from "../../../components/button.astro";
   let moves = 0;
   let gameComplete = false;
   let isGameReady = false;
+  let tileSize = MAX_TILE_SIZE;
+  let swipeStartX = 0;
+  let swipeStartY = 0;
+  let activePointerId: number | null = null;
+  const SWIPE_THRESHOLD = 24;
 
-  // ========================
-  // Game assets
-  // ========================
   const images = {
     player: new Image(),
     wall: new Image(),
@@ -106,20 +265,11 @@ import Button from "../../../components/button.astro";
     ground: new Image(),
   };
 
-  // ========================
-  // Game initialization
-  // ========================
   function init(): void {
-    // Load all images
     loadImages();
-
-    // Set up controls
     setupControls();
   }
 
-  // ========================
-  // Asset loading
-  // ========================
   function loadImages(): void {
     let loadedImages = 0;
     const totalImages = Object.keys(images).length;
@@ -149,34 +299,51 @@ import Button from "../../../components/button.astro";
     images.ground.src = "/assets/sokoban/ground.png";
   }
 
-  // ========================
-  // Level management
-  // ========================
   function initLevel(levelIdx: number): void {
     if (levelIdx >= levels.length) {
-      levelIdx = 0; // Wrap around to first level
+      levelIdx = 0;
     }
 
     currentLevel = levelIdx;
     moves = 0;
     gameComplete = false;
 
-    // Reset game state
     playerPos = { x: 0, y: 0 };
     gameMap = [];
     boxes = [];
     targets = [];
 
-    // Parse the level
     parseLevel(levels[levelIdx].map);
+    resizeCanvas();
+  }
 
-    // Adjust canvas size to fit the level
-    const maxWidth =
-      Math.max(...levels[levelIdx].map.map((row) => row.length)) * TILE_SIZE;
-    const maxHeight = levels[levelIdx].map.length * TILE_SIZE;
+  function resizeCanvas(): void {
+    if (gameMap.length === 0) {
+      return;
+    }
 
-    canvas.width = Math.max(maxWidth, 250);
-    canvas.height = Math.max(maxHeight + 40, 250); // Extra space for UI text
+    const maxWidth = Math.max(...gameMap.map((row) => row.length));
+    const maxHeight = gameMap.length;
+    const availableWidth = Math.max(window.innerWidth - CANVAS_PADDING, 240);
+    const reservedHeight = window.innerWidth <= 480 ? 220 : 320;
+    const availableHeight = Math.max(window.innerHeight - reservedHeight, 180);
+
+    tileSize = Math.max(
+      MIN_TILE_SIZE,
+      Math.min(
+        MAX_TILE_SIZE,
+        Math.floor(availableWidth / maxWidth),
+        Math.floor(availableHeight / maxHeight)
+      )
+    );
+
+    const canvasWidth = availableWidth;
+    const canvasHeight = maxHeight * tileSize + 40;
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+    canvas.style.width = "100%";
+    canvas.style.height = `${canvasHeight}px`;
   }
 
   function parseLevel(levelMap: string[]): void {
@@ -220,14 +387,10 @@ import Button from "../../../components/button.astro";
     }
   }
 
-  // ========================
-  // Controls setup
-  // ========================
   function setupControls(): void {
-    // Keyboard controls
     document.addEventListener("keydown", handleKeydown);
+    window.addEventListener("resize", resizeCanvas);
 
-    // Button controls
     const restartButton = document.querySelector("[data-canvas-restart]");
     const nextLevelButton = document.querySelector("[data-canvas-next]");
     const prevLevelButton = document.querySelector("[data-canvas-prev]");
@@ -235,7 +398,7 @@ import Button from "../../../components/button.astro";
     if (restartButton) {
       restartButton.addEventListener("click", (e) => {
         initLevel(currentLevel);
-        (e.target as HTMLButtonElement).blur(); // Remove focus from button
+        (e.currentTarget as HTMLButtonElement).blur();
       });
     }
 
@@ -246,7 +409,7 @@ import Button from "../../../components/button.astro";
         } else {
           initLevel(0);
         }
-        (e.target as HTMLButtonElement).blur(); // Remove focus from button
+        (e.currentTarget as HTMLButtonElement).blur();
       });
     }
 
@@ -257,21 +420,61 @@ import Button from "../../../components/button.astro";
         } else {
           initLevel(levels.length - 1);
         }
-        (e.target as HTMLButtonElement).blur(); // Remove focus from button
+        (e.currentTarget as HTMLButtonElement).blur();
       });
+    }
+
+    canvas.addEventListener("pointerdown", handlePointerDown);
+    canvas.addEventListener("pointerup", handlePointerUp);
+    canvas.addEventListener("pointercancel", handlePointerCancel);
+    canvas.addEventListener("pointerleave", handlePointerCancel);
+  }
+
+  function handlePointerDown(event: PointerEvent): void {
+    if (event.pointerType === "mouse" && event.button !== 0) {
+      return;
+    }
+
+    activePointerId = event.pointerId;
+    swipeStartX = event.clientX;
+    swipeStartY = event.clientY;
+    canvas.setPointerCapture(event.pointerId);
+  }
+
+  function handlePointerUp(event: PointerEvent): void {
+    if (activePointerId !== event.pointerId) {
+      return;
+    }
+
+    const deltaX = event.clientX - swipeStartX;
+    const deltaY = event.clientY - swipeStartY;
+    activePointerId = null;
+
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD && Math.abs(deltaY) < SWIPE_THRESHOLD) {
+      return;
+    }
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      movePlayer(deltaX > 0 ? 1 : -1, 0);
+    } else {
+      movePlayer(0, deltaY > 0 ? 1 : -1);
+    }
+  }
+
+  function handlePointerCancel(event: PointerEvent): void {
+    if (activePointerId === event.pointerId) {
+      activePointerId = null;
     }
   }
 
   function handleKeydown(event: KeyboardEvent): void {
     if (!isGameReady || gameComplete) {
       if (gameComplete && event.key === " ") {
-        // Next level on space when level is complete
         nextLevel();
         return;
       }
 
       if (gameComplete && (event.key === "r" || event.key === "R")) {
-        // Restart game on R when all levels are complete
         initLevel(0);
         return;
       }
@@ -297,11 +500,9 @@ import Button from "../../../components/button.astro";
         break;
       case "r":
       case "R":
-        // Restart current level
         initLevel(currentLevel);
         return;
       case "Escape":
-        // Restart current level
         initLevel(currentLevel);
         return;
       default:
@@ -318,41 +519,35 @@ import Button from "../../../components/button.astro";
     if (currentLevel < levels.length - 1) {
       initLevel(currentLevel + 1);
     } else {
-      // Game complete - restart from beginning
       gameComplete = true;
-      // Keep the victory screen until player presses R
     }
   }
 
-  // ========================
-  // Game mechanics
-  // ========================
   function movePlayer(dx: number, dy: number): void {
+    if (!isGameReady || gameComplete) {
+      return;
+    }
+
     const newX = playerPos.x + dx;
     const newY = playerPos.y + dy;
 
-    // Check if new position is valid
     if (isWall(newX, newY)) {
-      return; // Can't move through walls
+      return;
     }
 
-    // Check if there's a box to push
     const boxIndex = getBoxAt(newX, newY);
     if (boxIndex !== -1) {
       const newBoxX = newX + dx;
       const newBoxY = newY + dy;
 
-      // Can the box be pushed?
       if (isWall(newBoxX, newBoxY) || getBoxAt(newBoxX, newBoxY) !== -1) {
-        return; // Can't push box into wall or another box
+        return;
       }
 
-      // Move the box
       boxes[boxIndex].x = newBoxX;
       boxes[boxIndex].y = newBoxY;
     }
 
-    // Move the player
     playerPos.x = newX;
     playerPos.y = newY;
     moves++;
@@ -360,7 +555,7 @@ import Button from "../../../components/button.astro";
 
   function isWall(x: number, y: number): boolean {
     if (y < 0 || y >= gameMap.length || x < 0 || x >= gameMap[y].length) {
-      return true; // Out of bounds is treated as a wall
+      return true;
     }
     return gameMap[y][x] === "wall";
   }
@@ -374,7 +569,6 @@ import Button from "../../../components/button.astro";
   }
 
   function checkWin(): boolean {
-    // Level is complete when all targets have boxes on them
     const allBoxesOnTargets = targets.every((target) =>
       boxes.some((box) => box.x === target.x && box.y === target.y)
     );
@@ -382,7 +576,6 @@ import Button from "../../../components/button.astro";
     if (allBoxesOnTargets && !gameComplete) {
       gameComplete = true;
 
-      // If this was the last level, show game complete message
       if (currentLevel === levels.length - 1) {
         console.log("Game complete!");
       } else {
@@ -393,69 +586,61 @@ import Button from "../../../components/button.astro";
     return allBoxesOnTargets;
   }
 
-  // ========================
-  // Game rendering
-  // ========================
   function draw(): void {
     if (!isGameReady || !ctx) return;
 
-    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw map (walls and targets)
+    const boardWidth = Math.max(...gameMap.map((row) => row.length)) * tileSize;
+    const offsetX = Math.max((canvas.width - boardWidth) / 2, 0);
+    const offsetY = 0;
+
     for (let y = 0; y < gameMap.length; y++) {
       for (let x = 0; x < gameMap[y].length; x++) {
         const cell = gameMap[y][x];
-        const posX = x * TILE_SIZE;
-        const posY = y * TILE_SIZE;
+        const posX = offsetX + x * tileSize;
+        const posY = offsetY + y * tileSize;
 
         if (cell === "floor") {
-          ctx.drawImage(images.ground, posX, posY, TILE_SIZE, TILE_SIZE);
+          ctx.drawImage(images.ground, posX, posY, tileSize, tileSize);
         } else if (cell === "wall") {
-          ctx.drawImage(images.wall, posX, posY, TILE_SIZE, TILE_SIZE);
+          ctx.drawImage(images.wall, posX, posY, tileSize, tileSize);
         } else if (cell === "target") {
-          ctx.drawImage(images.target, posX, posY, TILE_SIZE, TILE_SIZE);
+          ctx.drawImage(images.target, posX, posY, tileSize, tileSize);
         }
       }
     }
 
-    // Draw boxes
     boxes.forEach((box) => {
-      const posX = box.x * TILE_SIZE;
-      const posY = box.y * TILE_SIZE;
-
-      // Check if box is on a target
+      const posX = offsetX + box.x * tileSize;
+      const posY = offsetY + box.y * tileSize;
       const onTarget = isTarget(box.x, box.y);
 
-      ctx.drawImage(images.box, posX, posY, TILE_SIZE, TILE_SIZE);
+      ctx.drawImage(images.box, posX, posY, tileSize, tileSize);
 
       if (onTarget) {
-        // Visual indication that box is on target
         ctx.fillStyle = "rgba(0, 255, 0, 0.3)";
-        ctx.fillRect(posX, posY, TILE_SIZE, TILE_SIZE);
+        ctx.fillRect(posX, posY, tileSize, tileSize);
       }
     });
 
-    // Draw player
     ctx.drawImage(
       images.player,
-      playerPos.x * TILE_SIZE,
-      playerPos.y * TILE_SIZE,
-      TILE_SIZE,
-      TILE_SIZE
+      offsetX + playerPos.x * tileSize,
+      offsetY + playerPos.y * tileSize,
+      tileSize,
+      tileSize
     );
 
-    // Draw UI information
     ctx.fillStyle = "black";
     ctx.font = "16px Arial";
     ctx.fillText(
       `Level: ${currentLevel + 1}/${levels.length}`,
-      10,
+      offsetX + 10,
       canvas.height - 10
     );
     ctx.fillText(`Moves: ${moves}`, canvas.width - 100, canvas.height - 10);
 
-    // Draw victory message if game is complete
     if (gameComplete) {
       ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -491,27 +676,19 @@ import Button from "../../../components/button.astro";
     }
   }
 
-  // ========================
-  // Game loop
-  // ========================
   function update(): void {
     if (gameComplete) return;
 
-    // Check win condition
     checkWin();
   }
 
   function gameLoop(): void {
-    // Update game state
     update();
 
-    // Render the game
     draw();
 
-    // Schedule next frame
     requestAnimationFrame(gameLoop);
   }
 
-  // Start the game when the page loads
   window.addEventListener("load", init);
 </script>

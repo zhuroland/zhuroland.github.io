@@ -12,8 +12,12 @@ export function getCanvasContext() {
     throw new Error("Failed to get canvas context");
   }
 
-  canvas.style.border = "1px solid black";
-  canvas.style.backgroundColor = "lightgray";
+  canvas.style.display = "block";
+  canvas.style.maxWidth = "100%";
+  canvas.style.height = "auto";
+  canvas.style.touchAction = "none";
+  canvas.style.backgroundColor = "transparent";
+  canvas.style.border = "none";
 
   return { canvas, ctx };
 }
