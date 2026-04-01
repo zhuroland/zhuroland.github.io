@@ -46,7 +46,8 @@ import Layout from "../../../layouts/SokobanLayout.astro";
   body {
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     background-color: oklch(98% 0.005 250);
   }
 </style>  
@@ -56,20 +57,26 @@ import Layout from "../../../layouts/SokobanLayout.astro";
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    gap: 1.5rem;
+    justify-content: flex-start;
+    min-height: 100dvh;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: clamp(0.75rem, 2vw, 1.5rem);
+    gap: 1rem;
     background-color: oklch(98% 0.005 250); /* slate-50 */
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
     color: oklch(32% 0.02 250); /* slate-700 */
   }
   .nav-links {
     display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 1rem;
-    margin-bottom: 1rem;
+    width: 100%;
   }
   .btn-link {
-    padding: 0.5rem 1rem;
+    padding: 0.45rem 0.85rem;
     background-color: oklch(100% 0 0 / 0.5);
     border: 1px solid oklch(86% 0.01 250 / 0.5);
     border-radius: 9999px;
@@ -88,9 +95,9 @@ import Layout from "../../../layouts/SokobanLayout.astro";
   }
 
   h1 { 
-    font-size: 2rem; 
-    line-height: 2.5rem; 
-    margin-bottom: 0.5rem; 
+    font-size: clamp(1.65rem, 4vw, 2rem); 
+    line-height: 1.2; 
+    margin: 0.25rem 0 0.25rem; 
     font-weight: 700;
     color: oklch(15% 0.02 250);
     letter-spacing: -0.025em;
@@ -100,13 +107,13 @@ import Layout from "../../../layouts/SokobanLayout.astro";
     display: flex;
     justify-content: space-between;
     width: 100%;
-    max-width: 320px;
+    max-width: 100%;
     align-items: center;
-    margin-bottom: 0.75rem;
+    gap: 0.5rem;
   }
   
   button {
-    padding: 0.5rem 1.25rem;
+    padding: 0.45rem 0.8rem;
     background-color: oklch(100% 0 0 / 0.7);
     border: 1px solid oklch(92% 0.01 250 / 0.6);
     border-radius: 0.5rem;
@@ -141,12 +148,14 @@ import Layout from "../../../layouts/SokobanLayout.astro";
   }
   
   canvas {
+    width: min(100%, 100vw);
+    height: auto;
     background-color: oklch(100% 0 0 / 0.6);
     cursor: pointer;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
     border-radius: 1rem;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    padding: 10px;
+    padding: 8px;
     border: 1px solid oklch(100% 0 0 / 0.3);
   }
 
@@ -172,15 +181,44 @@ import Layout from "../../../layouts/SokobanLayout.astro";
   .hidden { display: none; }
   
   footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    padding: 1rem;
+    position: static;
+    width: 100%;
+    padding: 0.75rem 0 0;
     font-size: 0.875rem;
+    text-align: center;
     color: oklch(69% 0.02 250);
   }
   a { color: oklch(53% 0.02 250); font-weight: 600; text-decoration: none; transition: color 0.2s; }
   a:hover { color: oklch(15% 0.02 250); }
+
+  @media (max-width: 420px) {
+    .game-wrapper {
+      padding: 0.5rem;
+      gap: 0.85rem;
+    }
+
+    .nav-links {
+      gap: 0.5rem;
+    }
+
+    .btn-link {
+      padding: 0.4rem 0.7rem;
+      font-size: 0.8rem;
+    }
+
+    .controls-top, .controls-mid {
+      gap: 0.35rem;
+    }
+
+    button {
+      padding: 0.4rem 0.7rem;
+      font-size: 0.82rem;
+    }
+
+    canvas {
+      padding: 6px;
+    }
+  }
 </style>
 
 <script>
@@ -223,14 +261,31 @@ import Layout from "../../../layouts/SokobanLayout.astro";
     restartBtn = document.querySelector('[data-restart-btn]');
 
     if (!canvas) return;
-    
-    // Set canvas size explicitly
-    canvas.width = CANVAS_SIZE;
-    canvas.height = CANVAS_SIZE;
+    resizeCanvas();
     ctx = canvas.getContext('2d');
 
     loadLevel(currentLevel);
     setupListeners();
+  }
+
+  function resizeCanvas() {
+    if (!canvas) return;
+
+    const isMobile = window.innerWidth <= 420;
+    const horizontalPadding = isMobile ? 16 : 32;
+    const reservedHeight = isMobile ? 170 : 260;
+    const maxBoardSize = isMobile ? window.innerWidth - horizontalPadding : 360;
+    const availableWidth = Math.max(window.innerWidth - horizontalPadding, 240);
+    const availableHeight = Math.max(window.innerHeight - reservedHeight, 240);
+    const targetSize = Math.max(240, Math.min(availableWidth, availableHeight, maxBoardSize));
+    const tileSize = Math.floor((targetSize - (GAP * 4)) / 5);
+    const boardSize = (tileSize * 5) + (GAP * 4);
+
+    canvas.width = boardSize;
+    canvas.height = boardSize;
+    canvas.style.width = "100%";
+    canvas.style.maxWidth = `${boardSize}px`;
+    canvas.style.height = "auto";
   }
 
   function loadLevel(lvlIndex: number) {
@@ -262,12 +317,16 @@ import Layout from "../../../layouts/SokobanLayout.astro";
     // Render Canvas
     // Clear with white background for the "card" effect inside canvas if needed, 
     // but we are drawing full tiles.
-    ctx.clearRect(0, 0, CANVAS_SIZE, CANVAS_SIZE);
+    ctx.clearRect(0, 0, canvas!.width, canvas!.height);
+    const tileSize = Math.floor((canvas!.width - (GAP * 4)) / 5);
+    const boardSize = (tileSize * 5) + (GAP * 4);
+    const offsetX = Math.max((canvas!.width - boardSize) / 2, 0);
+    const offsetY = Math.max((canvas!.height - boardSize) / 2, 0);
     
     tiles.forEach((row, rIndex) => {
       row.forEach((val, cIndex) => {
-        const x = cIndex * (TILE_SIZE + GAP);
-        const y = rIndex * (TILE_SIZE + GAP);
+        const x = offsetX + cIndex * (tileSize + GAP);
+        const y = offsetY + rIndex * (tileSize + GAP);
         
         // Draw tile
         // Modern colors: 
@@ -277,7 +336,7 @@ import Layout from "../../../layouts/SokobanLayout.astro";
         // Rounded rect function
         const radius = 8;
         ctx!.beginPath();
-        ctx!.roundRect(x, y, TILE_SIZE, TILE_SIZE, radius);
+        ctx!.roundRect(x, y, tileSize, tileSize, radius);
         
         if (val === 1) {
             // ON state - Dark/Active
@@ -306,15 +365,24 @@ import Layout from "../../../layouts/SokobanLayout.astro";
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    const col = Math.floor(x / (TILE_SIZE + GAP));
-    const row = Math.floor(y / (TILE_SIZE + GAP));
+    const tileSize = Math.floor((canvas.width - (GAP * 4)) / 5);
+    const boardSize = (tileSize * 5) + (GAP * 4);
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const boardX = x * scaleX;
+    const boardY = y * scaleY;
+    const offsetX = Math.max((canvas.width - boardSize) / 2, 0);
+    const offsetY = Math.max((canvas.height - boardSize) / 2, 0);
+
+    const col = Math.floor((boardX - offsetX) / (tileSize + GAP));
+    const row = Math.floor((boardY - offsetY) / (tileSize + GAP));
 
     // Check bounds
     if (row >= 0 && row < 5 && col >= 0 && col < 5) {
         // Check if click was in the gap
-        const tileX = col * (TILE_SIZE + GAP);
-        const tileY = row * (TILE_SIZE + GAP);
-        if (x >= tileX && x <= tileX + TILE_SIZE && y >= tileY && y <= tileY + TILE_SIZE) {
+      const tileX = offsetX + col * (tileSize + GAP);
+      const tileY = offsetY + row * (tileSize + GAP);
+      if (boardX >= tileX && boardX <= tileX + tileSize && boardY >= tileY && boardY <= tileY + tileSize) {
             handleClick(row, col);
         }
     }
@@ -373,4 +441,8 @@ import Layout from "../../../layouts/SokobanLayout.astro";
 
   initGame();
   document.addEventListener('astro:page-load', initGame);
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    render();
+  });
 </script>
