@@ -324,9 +324,19 @@ import Button from "../../../components/button.astro";
 
     const maxWidth = Math.max(...gameMap.map((row) => row.length));
     const maxHeight = gameMap.length;
-    const availableWidth = Math.max(window.innerWidth - CANVAS_PADDING, 240);
-    const reservedHeight = window.innerWidth <= 480 ? 220 : 320;
-    const availableHeight = Math.max(window.innerHeight - reservedHeight, 180);
+    const canvasShell = document.querySelector(".canvas-shell") as HTMLElement | null;
+    const navigation = document.querySelector(".navigation") as HTMLElement | null;
+    const controls = document.querySelector(".controls") as HTMLElement | null;
+    const shellWidth = canvasShell?.clientWidth ?? window.innerWidth - CANVAS_PADDING;
+    const navHeight = navigation?.getBoundingClientRect().height ?? 0;
+    const controlsHeight = controls?.getBoundingClientRect().height ?? 0;
+    const staticSpacing = window.innerWidth <= 480 ? 72 : 96;
+
+    const availableWidth = Math.max(shellWidth, 240);
+    const availableHeight = Math.max(
+      window.innerHeight - navHeight - controlsHeight - staticSpacing,
+      180
+    );
 
     tileSize = Math.max(
       MIN_TILE_SIZE,
@@ -343,7 +353,7 @@ import Button from "../../../components/button.astro";
     canvas.width = canvasWidth;
     canvas.height = canvasHeight;
     canvas.style.width = "100%";
-    canvas.style.height = `${canvasHeight}px`;
+    canvas.style.height = "auto";
   }
 
   function parseLevel(levelMap: string[]): void {
@@ -634,12 +644,30 @@ import Button from "../../../components/button.astro";
 
     ctx.fillStyle = "black";
     ctx.font = "16px Arial";
-    ctx.fillText(
-      `Level: ${currentLevel + 1}/${levels.length}`,
-      offsetX + 10,
-      canvas.height - 10
-    );
-    ctx.fillText(`Moves: ${moves}`, canvas.width - 100, canvas.height - 10);
+
+    const levelLabel = `Level: ${currentLevel + 1}/${levels.length}`;
+    const movesLabel = `Moves: ${moves}`;
+    const compactLabel = `L ${currentLevel + 1}/${levels.length} • M ${moves}`;
+    const labelY = canvas.height - 10;
+    const horizontalPadding = 10;
+    const minGap = 16;
+
+    const levelWidth = ctx.measureText(levelLabel).width;
+    const movesWidth = ctx.measureText(movesLabel).width;
+    const labelsFit = levelWidth + movesWidth + minGap <= canvas.width - horizontalPadding * 2;
+
+    if (labelsFit) {
+      ctx.textAlign = "left";
+      ctx.fillText(levelLabel, horizontalPadding, labelY);
+
+      ctx.textAlign = "right";
+      ctx.fillText(movesLabel, canvas.width - horizontalPadding, labelY);
+    } else {
+      ctx.textAlign = "center";
+      ctx.fillText(compactLabel, canvas.width / 2, labelY);
+    }
+
+    ctx.textAlign = "left";
 
     if (gameComplete) {
       ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
